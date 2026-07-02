@@ -40,19 +40,17 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedAdmin() {
-        Admin admin = adminRepository.findByUsername("admin").orElse(null);
-        if (admin == null) {
-            logger.info("Seeding default admin account...");
-            admin = new Admin();
-            admin.setUsername("admin");
-            admin.setRole("ROLE_ADMIN");
-        } else {
-            logger.info("Updating existing admin account password to sync default values...");
-        }
-        // Encrypt the password RasoiSutraAdmin2026!
-        admin.setEncryptedPassword(passwordEncoder.encode("RasoiSutraAdmin2026!"));
+        // Delete all old admin entries to prevent duplication or corrupt credential clashes
+        adminRepository.deleteAll();
+        logger.info("Old admin entries deleted.");
+
+        // Create a single fresh admin account with the requested password
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        admin.setRole("ROLE_ADMIN");
+        admin.setEncryptedPassword(passwordEncoder.encode("RasoiSutra2026"));
         adminRepository.save(admin);
-        logger.info("Admin account seeded/updated successfully.");
+        logger.info("New admin account seeded successfully with password: RasoiSutra2026");
     }
 
     private void seedCategoriesAndProducts() {

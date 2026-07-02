@@ -86,6 +86,7 @@ function AppContent() {
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/checkout" element={<Checkout onBackToShop={handleBackToShop} />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/login" element={<AdminDashboard />} />
         </Routes>
       </main>
