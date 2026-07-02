@@ -29,17 +29,17 @@ const ProductCard = ({ product }) => {
           src={
             product.images && product.images[0]
               ? product.images[0].includes('chilli')
-                ? '/src/assets/chilli.jpg'
+                ? '/chilli.jpg'
                 : product.images[0].includes('turmeric')
-                ? '/src/assets/turmeric.jpg'
+                ? '/turmeric.jpg'
                 : product.images[0].includes('garam')
-                ? '/src/assets/garam_masala.jpg'
+                ? '/garam_masala.jpg'
                 : product.images[0]
-              : '/src/assets/hero_spices.jpg'
+              : '/hero_spices.jpg'
           }
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/src/assets/hero_spices.jpg';
+            e.target.src = '/hero_spices.jpg';
           }}
           alt={product.name} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
