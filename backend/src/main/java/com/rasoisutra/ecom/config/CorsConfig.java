@@ -21,7 +21,8 @@ public class CorsConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:5173", 
                 "http://localhost:3000",
-                "https://*.vercel.app"
+                "https://*.vercel.app",
+                "https://*.netlify.app"
         ));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
