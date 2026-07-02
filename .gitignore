@@ -1,0 +1,67 @@
+# ==========================================
+# Root .gitignore for Rasoi Sutra E-Commerce
+# ==========================================
+
+# ----------------------------
+# OS & System Files
+# ----------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ----------------------------
+# IDEs and Editors
+# ----------------------------
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.classpath
+.project
+.settings/
+*.iml
+.nb-configuration.xml
+
+# ----------------------------
+# Frontend (Node / React / Vite)
+# ----------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ----------------------------
+# Backend (Java / Maven)
+# ----------------------------
+backend/target/
+backend/*.class
+backend/*.jar
+backend/*.war
+backend/*.ear
+backend/.mvn/wrapper/
+backend/mvnw
+backend/mvnw.cmd
+backend/.apt_generated/
+backend/.metadata/
+
+# Logs
+backend/logs/
+*.log
+dev-log.txt
+build-log*.txt
