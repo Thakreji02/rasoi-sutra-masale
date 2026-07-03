@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroSpices from '../assets/hero_spices.jpg';
+import logoImg from '../assets/logo.jpg';
 import { ArrowRight, Leaf, ShieldCheck, HeartHandshake, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -121,10 +122,10 @@ const Hero = () => {
           className="lg:col-span-5 flex items-center justify-center relative"
         >
           {/* Glowing ring */}
-          <div className="absolute w-[360px] h-[360px] sm:w-[420px] sm:h-[420px] rounded-full bg-gradient-to-tr from-amber-500/10 to-red-500/5 blur-xl pointer-events-none animate-pulse"></div>
+          <div className="absolute w-[380px] h-[380px] sm:w-[460px] sm:h-[460px] rounded-full bg-gradient-to-tr from-amber-500/10 to-red-500/5 blur-xl pointer-events-none animate-pulse"></div>
           
           {/* Outer circle backdrop */}
-          <div className="absolute w-[350px] h-[350px] sm:w-[400px] sm:h-[400px] rounded-full border-2 border-dashed border-amber-900/10 animate-[spin_120s_linear_infinite]"></div>
+          <div className="absolute w-[370px] h-[370px] sm:w-[450px] sm:h-[450px] rounded-full border-2 border-dashed border-amber-900/10 animate-[spin_120s_linear_infinite]"></div>
 
           {/* Spice Image Wheel */}
           <motion.img 
@@ -132,8 +133,17 @@ const Hero = () => {
             alt="Rasoi Sutra Premium Indian Spices Platter" 
             animate={{ rotate: 360 }}
             transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-            className="w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] rounded-full object-cover shadow-2xl border-8 border-white z-10" 
+            className="w-[360px] h-[360px] sm:w-[440px] sm:h-[440px] max-w-none rounded-full object-cover shadow-2xl z-10" 
           />
+
+          {/* Static Center Brand Logo - Statically Positioned, DOES NOT SPIN */}
+          <div className="absolute z-20 w-[140px] h-[140px] sm:w-[172px] sm:h-[172px] rounded-full flex items-center justify-center">
+            <img 
+              src={logoImg} 
+              alt="Rasoi Sutra Brand Logo" 
+              className="w-full h-full rounded-full object-cover z-30" 
+            />
+          </div>
           
           {/* Floating Freshness Badge */}
           <motion.div 
