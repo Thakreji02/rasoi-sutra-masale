@@ -25,6 +25,10 @@ const Checkout = ({ onBackToShop }) => {
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
   const [orderFailed, setOrderFailed] = useState(null);
+  
+  // Developer test simulator states
+  const [showPaymentSimulator, setShowPaymentSimulator] = useState(false);
+  const [activeOrderData, setActiveOrderData] = useState(null);
 
   const shippingCharge = cartTotal >= 500 ? 0 : 50; // free shipping over Rs 500
   const grandTotal = cartTotal + shippingCharge;
@@ -185,6 +189,16 @@ const Checkout = ({ onBackToShop }) => {
         setLoading(false);
       } else {
         // Razorpay Online Payment Flow
+        const rzpKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_mockKeyId';
+        
+        if (rzpKey === 'rzp_test_mockKeyId') {
+          // Launch local payment simulator modal to bypass Razorpay's API key verification error
+          setActiveOrderData(orderData);
+          setShowPaymentSimulator(true);
+          setLoading(false);
+          return;
+        }
+
         const isScriptLoaded = await loadRazorpayScript();
         if (!isScriptLoaded) {
           toast.error('Failed to load Razorpay Payment Gateway. Check internet connection.');
@@ -193,7 +207,7 @@ const Checkout = ({ onBackToShop }) => {
         }
 
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_mockKeyId', // API Key
+          key: rzpKey,
           amount: Math.round(orderData.totalAmount * 100), // Amount in paise
           currency: 'INR',
           name: 'Rasoi Sutra',
@@ -277,6 +291,68 @@ const Checkout = ({ onBackToShop }) => {
       setOrderFailed('Failed to initialize secure checkout order. Please check inputs.');
       setLoading(false);
     }
+  };
+
+  const handleSimulatePaymentSuccess = async () => {
+    if (!activeOrderData) return;
+    setShowPaymentSimulator(false);
+    setLoading(true);
+
+    const simulatedResponse = {
+      razorpay_order_id: activeOrderData.razorpayOrderId || 'order_MOCK_' + Math.random().toString(36).substring(2, 9).toUpperCase(),
+      razorpay_payment_id: 'pay_MOCK_' + Math.random().toString(36).substring(2, 9).toUpperCase(),
+      razorpay_signature: 'sig_MOCK_' + Math.random().toString(36).substring(2, 9).toUpperCase()
+    };
+
+    if (activeOrderData.id.startsWith('order_offline_')) {
+      setOrderSuccess({
+        id: activeOrderData.id,
+        orderNumber: activeOrderData.id.substring(activeOrderData.id.length - 6).toUpperCase(),
+        customerName: activeOrderData.customerName,
+        totalAmount: activeOrderData.totalAmount,
+        paymentStatus: 'PAID',
+        paymentMethod: 'Simulated Razorpay Online (Success)'
+      });
+      clearCart();
+      toast.success('Staging payment successful! Order is processing.');
+      setLoading(false);
+    } else {
+      try {
+        const verificationPayload = {
+          razorpayOrderId: simulatedResponse.razorpay_order_id,
+          razorpayPaymentId: simulatedResponse.razorpay_payment_id,
+          razorpaySignature: simulatedResponse.razorpay_signature
+        };
+
+        const verifyRes = await axiosInstance.post('/payments/verify', verificationPayload);
+        
+        if (verifyRes.data.success) {
+          const verifiedOrder = verifyRes.data.data;
+          setOrderSuccess({
+            id: verifiedOrder.id,
+            orderNumber: verifiedOrder.id.substring(verifiedOrder.id.length - 6).toUpperCase(),
+            customerName: verifiedOrder.customerName,
+            totalAmount: verifiedOrder.totalAmount,
+            paymentStatus: 'PAID',
+            paymentMethod: 'Razorpay Online (Simulated Success)'
+          });
+          clearCart();
+          toast.success('Payment verified successfully! Order is processing.');
+        } else {
+          setOrderFailed('Simulated payment signature verification failed on backend.');
+        }
+      } catch (err) {
+        console.error('Payment verification error', err);
+        setOrderFailed('Connection lost during simulated payment validation.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSimulatePaymentFailure = () => {
+    setShowPaymentSimulator(false);
+    setOrderFailed('Simulated Payment Transaction was rejected/failed by simulated user.');
   };
 
   // Success view
@@ -378,6 +454,57 @@ const Checkout = ({ onBackToShop }) => {
             <p className="text-xs text-amber-900/50 mt-2 leading-relaxed">
               Confirming transaction parameters with payment servers. Please do not refresh the browser or click the back button.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Razorpay Sandbox Payment Simulator Modal Overlay */}
+      {showPaymentSimulator && (
+        <div className="fixed inset-0 bg-[#2B1E17]/85 backdrop-blur-[6px] z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-amber-900/10 p-8 shadow-2xl max-w-md w-full text-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-[#991B1B] text-xs font-bold rounded-full mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#991B1B] animate-pulse"></span>
+              Razorpay Sandbox Simulator
+            </div>
+            
+            <h3 className="font-serif font-bold text-amber-950 text-2xl mb-1">Simulate Online Payment</h3>
+            <p className="text-xs text-amber-900/50 mb-6">Razorpay API credentials are not set locally. Use this sandbox simulator to test full e-commerce checkout integration.</p>
+            
+            <div className="bg-[#FAF6F0] rounded-2xl p-4 border border-amber-900/5 text-left mb-6 space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="text-amber-900/50">Merchant Name:</span>
+                <span className="font-bold text-amber-950">Rasoi Sutra Masale</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-amber-900/50">Order Reference:</span>
+                <span className="font-mono font-semibold text-amber-950">{activeOrderData?.id.substring(activeOrderData?.id.length - 8).toUpperCase()}</span>
+              </div>
+              <div className="flex justify-between border-t border-amber-900/10 pt-2 text-sm">
+                <span className="text-amber-950 font-bold">Amount to Pay:</span>
+                <span className="font-serif font-black text-[#991B1B]">₹{grandTotal}</span>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <button
+                onClick={handleSimulatePaymentSuccess}
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-2xl shadow-md transition-all text-sm"
+              >
+                Simulate Successful Payment (Paid)
+              </button>
+              <button
+                onClick={handleSimulatePaymentFailure}
+                className="w-full py-3 bg-red-50 hover:bg-red-100/50 text-red-600 font-bold border border-red-200 rounded-2xl transition-all text-xs"
+              >
+                Simulate Failed Payment (Declined)
+              </button>
+              <button
+                onClick={() => setShowPaymentSimulator(false)}
+                className="w-full py-2.5 bg-amber-900/5 hover:bg-amber-900/10 text-amber-950 font-bold rounded-2xl transition-all text-xs"
+              >
+                Cancel Checkout
+              </button>
+            </div>
           </div>
         </div>
       )}
