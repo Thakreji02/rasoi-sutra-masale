@@ -19,23 +19,56 @@ public class Product {
     private String id;
     
     @Indexed(unique = true)
-    private String name;
+    private String productName;
     
     @Indexed(unique = true)
     private String slug;
     
-    private String description;
-    private String categoryId;
-    private String brand = "Rasoi Sutra";
-    private List<String> images = new ArrayList<>();
-    private Double price;
-    private Double discount = 0.0;
+    private String category;
+    
+    private String brandName = "Rasoi Sutra";
+    
+    private String shortDescription;
+    
+    private String fullDescription;
+    
+    private String image;
+    
+    private List<String> galleryImages = new ArrayList<>();
+    
+    private Double mrp;
+    
+    private Double sellingPrice;
+    
+    private Double discountPercentage = 0.0;
+    
     private Integer stock = 0;
-    private List<String> weight = new ArrayList<>();
+    
+    private String unit; // e.g., "200g", "500g", "1kg"
+    
+    private Double weight; // weight value in numeric format (e.g. 200)
+    
     private List<String> ingredients = new ArrayList<>();
-    private Boolean isAvailable = true;
-    private Boolean featured = false;
+    
+    private String shelfLife; // e.g., "12 Months"
+    
+    private String storageInstructions;
+    
+    private String countryOfOrigin = "India";
+    
+    private Boolean isBestSeller = false;
+    
+    private Boolean isFeatured = false;
+    
+    private Double rating = 4.5;
+    
+    private Integer reviewsCount = 0;
+    
+    private Boolean available = true;
+    
+    private List<String> tags = new ArrayList<>();
     
     private LocalDateTime createdAt = LocalDateTime.now();
+    
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

@@ -3,7 +3,9 @@ package com.rasoisutra.ecom.controllers;
 import com.rasoisutra.ecom.dto.ApiResponse;
 import com.rasoisutra.ecom.dto.PaymentVerificationRequest;
 import com.rasoisutra.ecom.models.Order;
+import com.rasoisutra.ecom.models.Payment;
 import com.rasoisutra.ecom.repositories.OrderRepository;
+import com.rasoisutra.ecom.repositories.PaymentRepository;
 import com.rasoisutra.ecom.services.OrderService;
 import com.rasoisutra.ecom.services.PaymentService;
 import jakarta.validation.Valid;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -23,6 +27,9 @@ public class PaymentController {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private OrderService orderService;
@@ -50,6 +57,21 @@ public class PaymentController {
         order.setOrderStatus("PROCESSING"); // Mark order as processing for shipping
 
         orderService.saveOrderDirect(order); // Save and stream notify update
+
+        // Create and save the Payment audit record
+        Payment payment = new Payment();
+        payment.setRazorpayOrderId(request.getRazorpayOrderId());
+        payment.setRazorpayPaymentId(request.getRazorpayPaymentId());
+        payment.setRazorpaySignature(request.getRazorpaySignature());
+        payment.setAmount(order.getTotalAmount());
+        payment.setCurrency("INR");
+        payment.setPaymentStatus("SUCCESS");
+        payment.setPaymentMethod("RAZORPAY");
+        payment.setOrderId(order.getId());
+        payment.setUserId(null); // Guest user
+        payment.setCreatedAt(LocalDateTime.now());
+        
+        paymentRepository.save(payment);
 
         return ResponseEntity.ok(ApiResponse.success("Payment verified successfully", order));
     }

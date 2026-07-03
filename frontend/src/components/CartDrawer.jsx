@@ -4,7 +4,7 @@ import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CartDrawer = ({ isOpen, onClose, onCheckout }) => {
-  const { cartItems, removeFromCart, updateQuantity, cartTotal, getFinalPrice } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
 
   return (
     <AnimatePresence>
@@ -62,25 +62,25 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }) => {
                 ) : (
                   <div className="space-y-6">
                     {cartItems.map((item) => {
-                      const finalUnitPrice = getFinalPrice(item.price, item.weightSelected);
-                      const itemSubtotal = finalUnitPrice * item.quantity;
+                      const itemSubtotal = item.sellingPrice * item.quantity;
                       
                       return (
                         <div key={item.cartItemId} className="flex gap-4 items-center pb-5 border-b border-amber-900/5">
                           <img 
-                            src={item.imagePath || '/src/assets/hero_spices.jpg'} 
-                            alt={item.name} 
+                            src={item.image || '/hero_spices.jpg'} 
+                            alt={item.productName} 
+                            loading="lazy"
                             className="w-16 h-16 rounded-xl object-cover border border-amber-900/10 shrink-0 bg-white" 
                           />
                           
                           <div className="flex-1 min-w-0">
                             <h4 className="font-bold text-sm text-amber-950 truncate leading-snug">
-                              {item.name}
+                              {item.productName}
                             </h4>
                             <div className="flex gap-3 text-xs text-amber-900/50 mt-1">
-                              <span>Weight: {item.weightSelected}</span>
+                              <span>Weight: {item.unit}</span>
                               <span>•</span>
-                              <span>Price: ₹{finalUnitPrice}</span>
+                              <span>Price: ₹{item.sellingPrice}</span>
                             </div>
 
                             {/* Quantity Controls */}

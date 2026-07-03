@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
-import { ArrowLeft, CheckCircle, CreditCard, AlertCircle, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, ShoppingBag, Loader2, Home, Briefcase, MapPin } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const Checkout = ({ onBackToShop }) => {
-  const { cartItems, cartTotal, clearCart, getFinalPrice } = useCart();
+  const { cartItems, cartTotal, clearCart } = useCart();
+  const navigate = useNavigate();
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -22,9 +24,50 @@ const Checkout = ({ onBackToShop }) => {
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
+  const [orderFailed, setOrderFailed] = useState(null);
 
   const shippingCharge = cartTotal >= 500 ? 0 : 50; // free shipping over Rs 500
   const grandTotal = cartTotal + shippingCharge;
+
+  // Mock Saved Addresses for selection
+  const savedAddresses = [
+    {
+      id: 'addr_1',
+      label: 'Home',
+      icon: Home,
+      fullName: 'Aarti Sharma',
+      address: 'Flat 405, Gold Heritage, MG Road',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pincode: '411001',
+      mobileNumber: '9876543210'
+    },
+    {
+      id: 'addr_2',
+      label: 'Office',
+      icon: Briefcase,
+      fullName: 'Aarti Sharma',
+      address: 'Plot 12, Phase 3, Hinjewadi IT Park',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pincode: '411057',
+      mobileNumber: '9876543211'
+    }
+  ];
+
+  const handleSelectAddress = (addr) => {
+    setFormData({
+      ...formData,
+      fullName: addr.fullName,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+      mobileNumber: addr.mobileNumber
+    });
+    setFormErrors({});
+    toast.success(`Address filled from "${addr.label}" selection!`);
+  };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -82,13 +125,14 @@ const Checkout = ({ onBackToShop }) => {
 
     try {
       setLoading(true);
+      setOrderFailed(null);
       
-      // Map orderedItems to match the backend dto.OrderRequest Structure
+      // Map orderedItems to match the backend DTO Structure using new Product schema
       const orderedItems = cartItems.map(item => ({
         productId: item.id,
-        name: item.name,
-        price: getFinalPrice(item.price, item.weightSelected),
-        weightSelected: item.weightSelected,
+        name: item.productName,
+        price: item.sellingPrice,
+        weightSelected: item.unit || '200g',
         quantity: item.quantity
       }));
 
@@ -154,7 +198,7 @@ const Checkout = ({ onBackToShop }) => {
           currency: 'INR',
           name: 'Rasoi Sutra',
           description: 'Premium Aromatic Spices Payment',
-          image: '/src/assets/logo.jpg',
+          image: '/logo.jpg',
           handler: async function (response) {
             // Payment verified callback from Razorpay
             if (orderData.id.startsWith('order_offline_')) {
@@ -193,11 +237,11 @@ const Checkout = ({ onBackToShop }) => {
                   clearCart();
                   toast.success('Payment verified successfully! Order is processing.');
                 } else {
-                  toast.error('Payment verification failed.');
+                  setOrderFailed('Payment signature validation failed on secure servers.');
                 }
               } catch (err) {
                 console.error('Payment verification error', err);
-                toast.error('Payment verification API error.');
+                setOrderFailed('Connection lost during payment validation. Please contact support.');
               } finally {
                 setLoading(false);
               }
@@ -213,14 +257,13 @@ const Checkout = ({ onBackToShop }) => {
           },
           modal: {
             ondismiss: function () {
-              toast.warning('Payment process cancelled by user.');
+              setOrderFailed('Payment was cancelled by the user.');
               setLoading(false);
             }
           }
         };
 
         // If it's a real server order, supply the order_id. Otherwise, omit it
-        // (omitting order_id enables Direct Payment flow for sandbox staging mock keys)
         if (orderData.razorpayOrderId && !orderData.razorpayOrderId.startsWith('order_MOCK_')) {
           options.order_id = orderData.razorpayOrderId;
         }
@@ -231,7 +274,7 @@ const Checkout = ({ onBackToShop }) => {
 
     } catch (err) {
       console.error('Checkout error', err);
-      toast.error('Checkout process encountered an error.');
+      setOrderFailed('Failed to initialize secure checkout order. Please check inputs.');
       setLoading(false);
     }
   };
@@ -285,9 +328,60 @@ const Checkout = ({ onBackToShop }) => {
     );
   }
 
+  // Failed View
+  if (orderFailed) {
+    return (
+      <div className="py-20 px-4 max-w-4xl mx-auto flex items-center justify-center min-h-[70vh]">
+        <div className="bg-white rounded-3xl border border-amber-900/10 p-8 md:p-12 shadow-xl shadow-amber-900/5 text-center w-full max-w-lg">
+          <div className="h-16 w-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <XCircle size={36} />
+          </div>
+          <h2 className="text-3xl font-serif font-extrabold text-amber-950">Payment Failed</h2>
+          <p className="text-amber-900/60 mt-2 text-sm">We couldn't process your payment transaction.</p>
+          
+          <div className="bg-red-50/50 border border-red-200/50 rounded-2xl p-5 my-6 text-sm text-red-800 text-center font-semibold">
+            {orderFailed}
+          </div>
+
+          <p className="text-xs text-amber-900/50 leading-relaxed mb-8">
+            If money was debited from your account, it will be refunded automatically within 2-3 business days. You can try checkout again or select Cash on Delivery.
+          </p>
+
+          <div className="flex gap-4">
+            <button 
+              onClick={() => setOrderFailed(null)}
+              className="flex-1 py-3.5 bg-amber-900/10 hover:bg-[#FAF6F0] text-amber-950 font-bold border border-amber-900/10 rounded-2xl transition-all"
+            >
+              Try Again
+            </button>
+            <button 
+              onClick={onBackToShop}
+              className="flex-1 py-3.5 bg-[#991B1B] hover:bg-[#B91C1C] text-white font-bold rounded-2xl transition-all"
+            >
+              Back to Store
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Active form view
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Payment Loading State Modal Overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-[#2B1E17]/60 backdrop-blur-[4px] z-50 flex items-center justify-center flex-col gap-4">
+          <div className="bg-white p-8 rounded-3xl border border-amber-900/10 shadow-2xl flex flex-col items-center max-w-sm text-center">
+            <Loader2 size={40} className="text-[#991B1B] animate-spin mb-4" />
+            <h3 className="font-serif font-bold text-amber-950 text-lg">Secure Payment Verification</h3>
+            <p className="text-xs text-amber-900/50 mt-2 leading-relaxed">
+              Confirming transaction parameters with payment servers. Please do not refresh the browser or click the back button.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Back button */}
       <button 
         onClick={onBackToShop}
@@ -300,8 +394,32 @@ const Checkout = ({ onBackToShop }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         {/* Left Form Column */}
         <div className="lg:col-span-7 bg-white rounded-3xl border border-amber-900/10 p-6 md:p-8 shadow-xl shadow-amber-900/5">
-          <h2 className="text-2xl font-bold text-amber-950">Delivery Information</h2>
-          <p className="text-xs text-amber-900/50 mt-1 mb-8">No account registration required. Secure guest checkout.</p>
+          <div className="flex items-center justify-between gap-4 mb-4 border-b border-amber-900/5 pb-4 flex-wrap">
+            <div>
+              <h2 className="text-2xl font-bold text-amber-950">Delivery Information</h2>
+              <p className="text-xs text-amber-900/50 mt-1">No account registration required. Secure guest checkout.</p>
+            </div>
+            {/* Address Selection Buttons */}
+            <div className="flex items-center gap-2">
+              <span className="text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-widest flex items-center gap-1">
+                <MapPin size={12} /> Auto-fill:
+              </span>
+              {savedAddresses.map(addr => {
+                const Icon = addr.icon;
+                return (
+                  <button
+                    key={addr.id}
+                    type="button"
+                    onClick={() => handleSelectAddress(addr)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-amber-950 bg-amber-50 hover:bg-amber-100 rounded-xl border border-amber-900/10 shadow-sm"
+                  >
+                    <Icon size={12} className="text-[#991B1B]" />
+                    {addr.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <form onSubmit={handlePlaceOrder} className="space-y-6">
             <div>
@@ -479,17 +597,16 @@ const Checkout = ({ onBackToShop }) => {
           <h3 className="font-serif font-bold text-lg text-amber-950 pb-3 border-b border-amber-900/15">Order Summary</h3>
           <div className="max-h-[300px] overflow-y-auto divide-y divide-amber-900/5 pr-2 mt-4">
             {cartItems.map(item => {
-              const itemPrice = getFinalPrice(item.price, item.weightSelected);
               return (
                 <div key={item.cartItemId} className="flex gap-4 items-center py-4 first:pt-0 last:pb-0">
-                  <img src={item.imagePath} alt={item.name} className="w-12 h-12 rounded-lg object-cover shrink-0 border border-amber-900/10 bg-white" />
+                  <img src={item.image || '/hero_spices.jpg'} alt={item.productName} loading="lazy" className="w-12 h-12 rounded-lg object-cover shrink-0 border border-amber-900/10 bg-white" />
                   <div className="flex-1 min-w-0">
-                    <h5 className="font-bold text-xs text-amber-950 truncate leading-snug">{item.name}</h5>
+                    <h5 className="font-bold text-xs text-amber-950 truncate leading-snug">{item.productName}</h5>
                     <span className="block text-[0.65rem] text-amber-900/50 mt-1">
-                      Weight: {item.weightSelected} (Qty: {item.quantity})
+                      Weight: {item.unit} (Qty: {item.quantity})
                     </span>
                   </div>
-                  <span className="font-serif font-bold text-xs text-amber-950 shrink-0">₹{itemPrice * item.quantity}</span>
+                  <span className="font-serif font-bold text-xs text-amber-950 shrink-0">₹{item.sellingPrice * item.quantity}</span>
                 </div>
               );
             })}

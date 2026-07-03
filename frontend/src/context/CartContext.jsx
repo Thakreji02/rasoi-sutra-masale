@@ -12,11 +12,11 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('rasoi_sutra_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1, weightSelected) => {
+  const addToCart = (product, quantity = 1, unitSelected) => {
     setCartItems(prevItems => {
-      // Find if item with same ID AND same weight selection already exists in cart
+      // Find if item with same ID already exists in cart
       const existingItemIndex = prevItems.findIndex(
-        item => item.id === product.id && item.weightSelected === weightSelected
+        item => item.id === product.id
       );
 
       if (existingItemIndex > -1) {
@@ -24,17 +24,16 @@ export const CartProvider = ({ children }) => {
         updatedItems[existingItemIndex].quantity += quantity;
         return updatedItems;
       } else {
-        // Create a unique identifier for items of different weight
-        const cartItemId = `${product.id}-${weightSelected.replace(/\s+/g, '')}`;
+        const cartItemId = `${product.id}`;
         return [
           ...prevItems,
           {
             cartItemId,
             id: product.id,
-            name: product.name,
-            price: product.price,
-            imagePath: product.imagePath,
-            weightSelected,
+            productName: product.productName,
+            sellingPrice: product.sellingPrice,
+            image: product.image,
+            unit: unitSelected || product.unit || '200g',
             quantity
           }
         ];
@@ -62,27 +61,8 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const cartTotal = cartItems.reduce((total, item) => {
-    // Add extra price multiplier based on weight if necessary, but price in product is base price.
-    // For simplicity, we assume price remains the base price, or weight package scales price.
-    // Let's implement weight-based scale if needed.
-    // Let's assume standard base prices and the weight options represent packages of that price.
-    // E.g., "100g" is the base price. "250g" could be base * 2.2, "500g" base * 4.
-    // Let's check how we want to scale it. Let's make it super simple:
-    // We can parse the weight selection to see if it's 250g or 500g and scale price:
-    let multiplier = 1;
-    if (item.weightSelected.includes('250g')) multiplier = 2.2;
-    else if (item.weightSelected.includes('500g')) multiplier = 4.0;
-    
-    const finalItemPrice = Math.round(item.price * multiplier);
-    return total + (finalItemPrice * item.quantity);
+    return total + (item.sellingPrice * item.quantity);
   }, 0);
-
-  const getFinalPrice = (price, weightSelected) => {
-    let multiplier = 1;
-    if (weightSelected.includes('250g')) multiplier = 2.2;
-    else if (weightSelected.includes('500g')) multiplier = 4.0;
-    return Math.round(price * multiplier);
-  };
 
   return (
     <CartContext.Provider value={{
@@ -92,8 +72,7 @@ export const CartProvider = ({ children }) => {
       updateQuantity,
       clearCart,
       cartCount,
-      cartTotal,
-      getFinalPrice
+      cartTotal
     }}>
       {children}
     </CartContext.Provider>

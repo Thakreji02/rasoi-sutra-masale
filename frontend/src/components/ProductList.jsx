@@ -11,7 +11,7 @@ const ProductList = () => {
   const [error, setError] = useState(null);
   
   // Filters & Sorting state
-  const [selectedCategoryId, setSelectedCategoryId] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +27,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategoryId, sortBy, direction, currentPage]);
+  }, [selectedCategory, sortBy, direction, currentPage]);
 
   const fetchCategories = async () => {
     try {
@@ -37,14 +37,12 @@ const ProductList = () => {
       }
     } catch (err) {
       console.warn('Failed to load categories, loading fallback...', err);
-      try {
-        const localData = await import('../../../backend/data/db.json');
-        if (localData && localData.categories) {
-          setCategories(localData.categories);
-        }
-      } catch (innerErr) {
-        console.error('Fallback categories error', innerErr);
-      }
+      // Fallback categories list
+      setCategories([
+        { id: '1', categoryName: 'Ground Spices' },
+        { id: '2', categoryName: 'Whole Spices' },
+        { id: '3', categoryName: 'Spice Blends' }
+      ]);
     }
   };
 
@@ -53,7 +51,7 @@ const ProductList = () => {
       setLoading(true);
       setError(null);
 
-      // Build parameters
+      // Build parameters using the new schema keys
       const params = {
         page: currentPage,
         size: 8,
@@ -65,8 +63,8 @@ const ProductList = () => {
         params.keyword = searchTerm;
       }
 
-      if (selectedCategoryId !== 'All') {
-        params.categoryId = selectedCategoryId;
+      if (selectedCategory !== 'All') {
+        params.category = selectedCategory;
       }
 
       if (priceRange.min !== '') {
@@ -88,38 +86,114 @@ const ProductList = () => {
       }
     } catch (err) {
       console.warn('Error fetching products from server, loading local fallback...', err);
-      try {
-        const localData = await import('../../../backend/data/db.json');
-        if (localData && localData.products) {
-          let items = localData.products;
-          if (selectedCategoryId !== 'All') {
-            // Find category Name matching categoryId in categories to check fallback
-            items = items.filter(p => p.categoryId === selectedCategoryId || p.category.toLowerCase() === selectedCategoryId.toLowerCase());
-          }
-          if (searchTerm && searchTerm.trim() !== '') {
-            items = items.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.description.toLowerCase().includes(searchTerm.toLowerCase()));
-          }
-          if (priceRange.min !== '') {
-            items = items.filter(p => p.price >= parseFloat(priceRange.min));
-          }
-          if (priceRange.max !== '') {
-            items = items.filter(p => p.price <= parseFloat(priceRange.max));
-          }
-          
-          // Sort
-          if (sortBy === 'price') {
-            items = [...items].sort((a, b) => direction === 'asc' ? a.price - b.price : b.price - a.price);
-          } else {
-            items = [...items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          }
-
-          setProducts(items);
-          setTotalPages(1);
-          setTotalItems(items.length);
+      // Local fallback spices
+      const localProducts = [
+        {
+          id: '1',
+          productName: 'Premium Haldi Powder',
+          slug: 'premium-haldi-powder',
+          category: 'Ground Spices',
+          brandName: 'Rasoi Sutra',
+          shortDescription: '100% Pure & Natural premium turmeric powder with high curcumin content.',
+          image: '/haldi.jpg',
+          mrp: 120.0,
+          sellingPrice: 99.0,
+          discountPercentage: 17.5,
+          stock: 150,
+          unit: '200g',
+          shelfLife: '12 Months',
+          countryOfOrigin: 'India',
+          isBestSeller: true,
+          isFeatured: true,
+          rating: 4.8,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          productName: 'Premium Lal Mirch Powder',
+          slug: 'premium-lal-mirch-powder',
+          category: 'Ground Spices',
+          brandName: 'Rasoi Sutra',
+          shortDescription: '100% Pure & Natural vibrant red chilli powder with mild pleasant heat.',
+          image: '/chilli.jpg',
+          mrp: 150.0,
+          sellingPrice: 129.0,
+          discountPercentage: 14.0,
+          stock: 120,
+          unit: '200g',
+          shelfLife: '12 Months',
+          countryOfOrigin: 'India',
+          isBestSeller: true,
+          isFeatured: true,
+          rating: 4.9,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '3',
+          productName: 'Premium Garam Masala',
+          slug: 'premium-garam-masala',
+          category: 'Spice Blends',
+          brandName: 'Rasoi Sutra',
+          shortDescription: 'Traditional blend of premium roasted whole spices for rich flavor and aroma.',
+          image: '/garam_masala.jpg',
+          mrp: 180.0,
+          sellingPrice: 149.0,
+          discountPercentage: 17.2,
+          stock: 100,
+          unit: '200g',
+          shelfLife: '12 Months',
+          countryOfOrigin: 'India',
+          isBestSeller: true,
+          isFeatured: true,
+          rating: 4.7,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '4',
+          productName: 'Premium Jeera Whole',
+          slug: 'premium-jeera-whole',
+          category: 'Whole Spices',
+          brandName: 'Rasoi Sutra',
+          shortDescription: '100% Pure & Natural bold cumin seeds with intense earthy aroma.',
+          image: '/jeera.jpg',
+          mrp: 160.0,
+          sellingPrice: 135.0,
+          discountPercentage: 15.6,
+          stock: 180,
+          unit: '200g',
+          shelfLife: '12 Months',
+          countryOfOrigin: 'India',
+          isBestSeller: false,
+          isFeatured: true,
+          rating: 4.6,
+          createdAt: new Date().toISOString()
         }
-      } catch (innerErr) {
-        setError('Failed to load spices from mock database.');
+      ];
+
+      let items = localProducts;
+      if (selectedCategory !== 'All') {
+        items = items.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase());
       }
+      if (searchTerm && searchTerm.trim() !== '') {
+        items = items.filter(p => p.productName.toLowerCase().includes(searchTerm.toLowerCase()) || p.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()));
+      }
+      if (priceRange.min !== '') {
+        items = items.filter(p => p.sellingPrice >= parseFloat(priceRange.min));
+      }
+      if (priceRange.max !== '') {
+        items = items.filter(p => p.sellingPrice <= parseFloat(priceRange.max));
+      }
+      
+      // Sort
+      if (sortBy === 'sellingPrice') {
+        items = [...items].sort((a, b) => direction === 'asc' ? a.sellingPrice - b.sellingPrice : b.sellingPrice - a.sellingPrice);
+      } else {
+        items = [...items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+
+      setProducts(items);
+      setTotalPages(1);
+      setTotalItems(items.length);
     } finally {
       setLoading(false);
     }
@@ -133,7 +207,7 @@ const ProductList = () => {
 
   const handleClearFilters = () => {
     setSearchTerm('');
-    setSelectedCategoryId('All');
+    setSelectedCategory('All');
     setSortBy('createdAt');
     setDirection('desc');
     setPriceRange({ min: '', max: '' });
@@ -143,10 +217,10 @@ const ProductList = () => {
   const handleSortChange = (e) => {
     const value = e.target.value;
     if (value === 'price-asc') {
-      setSortBy('price');
+      setSortBy('sellingPrice');
       setDirection('asc');
     } else if (value === 'price-desc') {
-      setSortBy('price');
+      setSortBy('sellingPrice');
       setDirection('desc');
     } else {
       setSortBy('createdAt');
@@ -173,7 +247,7 @@ const ProductList = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-900/40" size={18} />
               <input
                 type="text"
-                placeholder="Search spices (e.g. Turmeric, Kashmiri)..."
+                placeholder="Search spices (e.g. Haldi, Lal Mirch)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-2xl text-sm font-medium focus:outline-none focus:border-[#991B1B] focus:ring-1 focus:ring-[#991B1B] transition-all"
@@ -244,9 +318,9 @@ const ProductList = () => {
             <Filter size={16} className="text-[#991B1B] shrink-0" />
             <div className="flex gap-2">
               <button
-                onClick={() => { setSelectedCategoryId('All'); setCurrentPage(0); }}
+                onClick={() => { setSelectedCategory('All'); setCurrentPage(0); }}
                 className={`px-4 py-2 text-xs font-bold rounded-full border whitespace-nowrap transition-all ${
-                  selectedCategoryId === 'All'
+                  selectedCategory === 'All'
                     ? 'bg-amber-500 text-[#451A03] border-amber-500 shadow-md'
                     : 'bg-[#FAF6F0] text-amber-900/70 border-amber-900/10 hover:border-amber-500'
                 }`}
@@ -256,9 +330,9 @@ const ProductList = () => {
               {categories.map((cat) => (
                 <button
                   key={cat.id}
-                  onClick={() => { setSelectedCategoryId(cat.id); setCurrentPage(0); }}
+                  onClick={() => { setSelectedCategory(cat.categoryName); setCurrentPage(0); }}
                   className={`px-4 py-2 text-xs font-bold rounded-full border whitespace-nowrap transition-all ${
-                    selectedCategoryId === cat.id
+                    selectedCategory === cat.categoryName
                       ? 'bg-amber-500 text-[#451A03] border-amber-500 shadow-md'
                       : 'bg-[#FAF6F0] text-amber-900/70 border-amber-900/10 hover:border-amber-500'
                   }`}

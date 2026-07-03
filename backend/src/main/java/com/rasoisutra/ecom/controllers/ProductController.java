@@ -23,7 +23,7 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<?> getProducts(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String category,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -31,7 +31,7 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size) {
         
-        Page<Product> productPage = productService.getFilteredProducts(keyword, categoryId, minPrice, maxPrice, sortBy, direction, page, size);
+        Page<Product> productPage = productService.getFilteredProducts(keyword, category, minPrice, maxPrice, sortBy, direction, page, size);
         
         Map<String, Object> response = new HashMap<>();
         response.put("products", productPage.getContent());
@@ -78,18 +78,29 @@ public class ProductController {
         Product existingProduct = productService.getProductById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
-        existingProduct.setName(product.getName());
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setCategoryId(product.getCategoryId());
-        existingProduct.setBrand(product.getBrand());
-        existingProduct.setImages(product.getImages());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setDiscount(product.getDiscount());
+        existingProduct.setProductName(product.getProductName());
+        existingProduct.setCategory(product.getCategory());
+        existingProduct.setBrandName(product.getBrandName());
+        existingProduct.setShortDescription(product.getShortDescription());
+        existingProduct.setFullDescription(product.getFullDescription());
+        existingProduct.setImage(product.getImage());
+        existingProduct.setGalleryImages(product.getGalleryImages());
+        existingProduct.setMrp(product.getMrp());
+        existingProduct.setSellingPrice(product.getSellingPrice());
+        existingProduct.setDiscountPercentage(product.getDiscountPercentage());
         existingProduct.setStock(product.getStock());
+        existingProduct.setUnit(product.getUnit());
         existingProduct.setWeight(product.getWeight());
         existingProduct.setIngredients(product.getIngredients());
-        existingProduct.setIsAvailable(product.getIsAvailable());
-        existingProduct.setFeatured(product.getFeatured());
+        existingProduct.setShelfLife(product.getShelfLife());
+        existingProduct.setStorageInstructions(product.getStorageInstructions());
+        existingProduct.setCountryOfOrigin(product.getCountryOfOrigin());
+        existingProduct.setIsBestSeller(product.getIsBestSeller());
+        existingProduct.setIsFeatured(product.getIsFeatured());
+        existingProduct.setRating(product.getRating());
+        existingProduct.setReviewsCount(product.getReviewsCount());
+        existingProduct.setAvailable(product.getAvailable());
+        existingProduct.setTags(product.getTags());
 
         Product updatedProduct = productService.saveProduct(existingProduct);
         return ResponseEntity.ok(ApiResponse.success("Product updated successfully", updatedProduct));

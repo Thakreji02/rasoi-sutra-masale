@@ -1,52 +1,44 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Star } from 'lucide-react';
 
 const ProductCard = ({ product }) => {
-  const { addToCart, getFinalPrice } = useCart();
+  const { addToCart } = useCart();
   
-  // Parse weight options (e.g. from array or list)
-  const options = product.weight && product.weight.length > 0 ? product.weight : ['100g'];
-  
-  const [selectedWeight, setSelectedWeight] = useState(options[0]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  // Compute final price based on selected weight package
-  const finalPrice = getFinalPrice(product.price, selectedWeight);
-
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedWeight);
+    // Add to cart using the new schema parameters
+    addToCart(product, quantity, product.unit || '200g');
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
+
+  const hasDiscount = product.mrp && product.mrp > product.sellingPrice;
 
   return (
     <div className="bg-white rounded-3xl border border-amber-900/10 overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full group">
       {/* Product Image Box */}
       <div className="relative h-56 overflow-hidden bg-amber-50/20 flex items-center justify-center">
         <img 
-          src={
-            product.images && product.images[0]
-              ? product.images[0].includes('chilli')
-                ? '/chilli.jpg'
-                : product.images[0].includes('turmeric')
-                ? '/turmeric.jpg'
-                : product.images[0].includes('garam')
-                ? '/garam_masala.jpg'
-                : product.images[0]
-              : '/hero_spices.jpg'
-          }
+          src={product.image || '/hero_spices.jpg'}
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = '/hero_spices.jpg';
           }}
-          alt={product.name} 
+          alt={product.productName} 
+          loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
         />
         <span className="absolute top-4 left-4 bg-[#991B1B] text-amber-100 text-[0.65rem] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-          {product.brand}
+          {product.brandName || 'Rasoi Sutra'}
         </span>
+        {product.isBestSeller && (
+          <span className="absolute bottom-4 left-4 bg-amber-500 text-amber-950 text-[0.65rem] font-extrabold px-2.5 py-1 rounded-lg shadow-sm">
+            Best Seller
+          </span>
+        )}
         {product.stock <= 5 && product.stock > 0 && (
           <span className="absolute top-4 right-4 bg-orange-100 text-orange-800 text-[0.65rem] font-extrabold px-2.5 py-1 rounded-lg border border-orange-200">
             Only {product.stock} left
@@ -61,41 +53,48 @@ const ProductCard = ({ product }) => {
 
       {/* Product Details */}
       <div className="p-6 flex flex-col flex-grow">
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-widest text-[#B45309] bg-amber-50 px-2.5 py-0.5 rounded-md">
+            {product.category}
+          </span>
+          {product.rating && (
+            <div className="flex items-center gap-0.5 text-amber-500 text-xs font-bold">
+              <Star size={12} fill="currentColor" />
+              <span>{product.rating}</span>
+            </div>
+          )}
+        </div>
+
         <h3 className="font-serif font-bold text-lg text-amber-950 group-hover:text-[#991B1B] transition-colors leading-tight">
-          {product.name}
+          {product.productName} <span className="text-sm font-sans font-normal text-amber-900/60">({product.unit || '200g'})</span>
         </h3>
         <p className="mt-2 text-xs text-amber-900/60 leading-relaxed line-clamp-3 flex-grow">
-          {product.description}
+          {product.shortDescription}
         </p>
 
-        {/* Weight Selector */}
-        <div className="mt-4 pt-4 border-t border-amber-900/5">
-          <span className="block text-[0.7rem] font-bold text-amber-900/60 uppercase tracking-widest mb-2">
-            Select Pack Weight:
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {options.map(opt => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => setSelectedWeight(opt)}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
-                  selectedWeight === opt 
-                    ? 'bg-[#991B1B] text-white border-[#991B1B] shadow-md' 
-                    : 'bg-[#FDFBF7] text-[#451A03] border-amber-900/10 hover:border-[#991B1B] hover:text-[#991B1B]'
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
+        {/* Info badges */}
+        <div className="mt-4 pt-3 border-t border-amber-900/5 flex justify-between text-[0.65rem] text-amber-900/60 font-semibold">
+          <span>Shelf Life: {product.shelfLife || '12 Months'}</span>
+          <span>Origin: {product.countryOfOrigin || 'India'}</span>
         </div>
 
         {/* Pricing & Add to Cart Footer */}
-        <div className="mt-5 pt-4 border-t border-amber-900/5 flex items-center justify-between">
-          <div className="flex items-baseline text-[#991B1B] gap-0.5">
-            <span className="text-sm font-semibold">₹</span>
-            <span className="font-sans text-xl font-bold tracking-normal">{finalPrice}</span>
+        <div className="mt-4 pt-4 border-t border-amber-900/5 flex items-center justify-between">
+          <div className="flex flex-col">
+            {hasDiscount && (
+              <span className="text-xs text-amber-900/40 line-through">
+                ₹{product.mrp}
+              </span>
+            )}
+            <div className="flex items-baseline text-[#991B1B] gap-0.5">
+              <span className="text-sm font-semibold">₹</span>
+              <span className="font-sans text-xl font-bold tracking-normal">{product.sellingPrice}</span>
+              {hasDiscount && product.discountPercentage && (
+                <span className="ml-2 text-[0.7rem] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  {Math.round(product.discountPercentage)}% OFF
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center bg-[#FAF6F0] border border-amber-900/10 rounded-lg overflow-hidden shadow-inner">

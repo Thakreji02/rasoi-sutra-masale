@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import About from './components/About';
-import ProductList from './components/ProductList';
-import AvailableOn from './components/AvailableOn';
-import Reviews from './components/Reviews';
-import Contact from './components/Contact';
 import CartDrawer from './components/CartDrawer';
-import Checkout from './components/Checkout';
-import AdminDashboard from './components/AdminDashboard';
 import Footer from './components/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ArrowRight } from 'lucide-react';
+
+// Lazy load routing components for optimization
+const About = lazy(() => import('./components/About'));
+const ProductList = lazy(() => import('./components/ProductList'));
+const AvailableOn = lazy(() => import('./components/AvailableOn'));
+const Reviews = lazy(() => import('./components/Reviews'));
+const Contact = lazy(() => import('./components/Contact'));
+const Checkout = lazy(() => import('./components/Checkout'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+
+const LoadingFallback = () => (
+  <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+    <div className="w-12 h-12 border-4 border-amber-900/10 border-l-[#991B1B] rounded-full animate-spin"></div>
+    <p className="text-amber-950/60 font-semibold text-sm">Loading Rasoi Sutra...</p>
+  </div>
+);
 
 function HomeContent() {
   const navigate = useNavigate();
@@ -78,17 +87,19 @@ function AppContent() {
       <Navbar onCartToggle={toggleCart} />
 
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomeContent />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/available-on" element={<AvailableOn />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/checkout" element={<Checkout onBackToShop={handleBackToShop} />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/login" element={<AdminDashboard />} />
-        </Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<HomeContent />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/available-on" element={<AvailableOn />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/checkout" element={<Checkout onBackToShop={handleBackToShop} />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/login" element={<AdminDashboard />} />
+          </Routes>
+        </Suspense>
       </main>
 
       <CartDrawer 

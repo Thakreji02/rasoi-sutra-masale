@@ -13,11 +13,11 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
     Optional<Product> findBySlug(String slug);
-    List<Product> findByCategoryId(String categoryId);
-    List<Product> findByFeaturedTrue();
+    List<Product> findByCategory(String category);
+    List<Product> findByIsFeaturedTrue();
     
-    @Query("{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } } ] }")
+    @Query("{ $or: [ { 'productName': { $regex: ?0, $options: 'i' } }, { 'shortDescription': { $regex: ?0, $options: 'i' } }, { 'fullDescription': { $regex: ?0, $options: 'i' } } ] }")
     Page<Product> searchProducts(String keyword, Pageable pageable);
     
-    Page<Product> findByCategoryId(String categoryId, Pageable pageable);
+    Page<Product> findByCategory(String category, Pageable pageable);
 }

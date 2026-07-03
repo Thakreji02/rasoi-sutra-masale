@@ -26,15 +26,23 @@ const AdminDashboard = () => {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({
-    name: '',
-    description: '',
-    categoryId: '',
-    price: '',
-    discount: '0',
+    productName: '',
+    category: 'Ground Spices',
+    shortDescription: '',
+    fullDescription: '',
+    image: '/haldi.jpg',
+    mrp: '',
+    sellingPrice: '',
     stock: '100',
-    weight: '100g, 250g, 500g',
-    ingredients: '100% Raw Spices',
-    featured: false
+    unit: '200g',
+    weight: '200',
+    ingredients: '100% Natural Spices',
+    shelfLife: '12 Months',
+    storageInstructions: 'Store in a cool dry place.',
+    countryOfOrigin: 'India',
+    isBestSeller: false,
+    isFeatured: false,
+    tags: 'spices, pure'
   });
 
   useEffect(() => {
@@ -193,21 +201,30 @@ const AdminDashboard = () => {
   const handleProductSubmit = async (e) => {
     e.preventDefault();
     
-    // Parse weight and ingredients lists
-    const weightsList = productForm.weight.split(',').map(w => w.trim());
     const ingredientsList = productForm.ingredients.split(',').map(i => i.trim());
+    const tagsList = productForm.tags.split(',').map(t => t.trim());
 
     const productPayload = {
-      name: productForm.name,
-      description: productForm.description,
-      categoryId: productForm.categoryId || (categories[0] ? categories[0].id : ''),
-      price: parseFloat(productForm.price),
-      discount: parseFloat(productForm.discount),
+      productName: productForm.productName,
+      category: productForm.category,
+      brandName: productForm.brandName || "Rasoi Sutra",
+      shortDescription: productForm.shortDescription,
+      fullDescription: productForm.fullDescription,
+      image: productForm.image || '/haldi.jpg',
+      mrp: parseFloat(productForm.mrp),
+      sellingPrice: parseFloat(productForm.sellingPrice),
+      discountPercentage: productForm.mrp && productForm.sellingPrice ? Math.max(0, Math.round(((parseFloat(productForm.mrp) - parseFloat(productForm.sellingPrice)) / parseFloat(productForm.mrp)) * 100)) : 0,
       stock: parseInt(productForm.stock),
-      weight: weightsList,
+      unit: productForm.unit,
+      weight: parseFloat(productForm.weight),
       ingredients: ingredientsList,
-      featured: productForm.featured,
-      isAvailable: true
+      shelfLife: productForm.shelfLife,
+      storageInstructions: productForm.storageInstructions,
+      countryOfOrigin: productForm.countryOfOrigin,
+      isBestSeller: productForm.isBestSeller,
+      isFeatured: productForm.isFeatured,
+      available: productForm.available,
+      tags: tagsList
     };
 
     try {
@@ -235,15 +252,25 @@ const AdminDashboard = () => {
   const handleEditProduct = (product) => {
     setEditingProduct(product);
     setProductForm({
-      name: product.name,
-      description: product.description,
-      categoryId: product.categoryId,
-      price: product.price.toString(),
-      discount: product.discount.toString(),
-      stock: product.stock.toString(),
-      weight: product.weight.join(', '),
-      ingredients: product.ingredients.join(', '),
-      featured: product.featured || false
+      productName: product.productName || '',
+      category: product.category || 'Ground Spices',
+      brandName: product.brandName || 'Rasoi Sutra',
+      shortDescription: product.shortDescription || '',
+      fullDescription: product.fullDescription || '',
+      image: product.image || '',
+      mrp: product.mrp ? product.mrp.toString() : '',
+      sellingPrice: product.sellingPrice ? product.sellingPrice.toString() : '',
+      stock: product.stock ? product.stock.toString() : '100',
+      unit: product.unit || '200g',
+      weight: product.weight ? product.weight.toString() : '200',
+      ingredients: product.ingredients ? product.ingredients.join(', ') : '',
+      shelfLife: product.shelfLife || '12 Months',
+      storageInstructions: product.storageInstructions || 'Store in a cool dry place.',
+      countryOfOrigin: product.countryOfOrigin || 'India',
+      isBestSeller: product.isBestSeller || false,
+      isFeatured: product.isFeatured || false,
+      available: product.available !== undefined ? product.available : true,
+      tags: product.tags ? product.tags.join(', ') : ''
     });
     setShowProductForm(true);
   };
@@ -307,15 +334,25 @@ const AdminDashboard = () => {
     setShowProductForm(false);
     setEditingProduct(null);
     setProductForm({
-      name: '',
-      description: '',
-      categoryId: categories[0] ? categories[0].id : '',
-      price: '',
-      discount: '0',
+      productName: '',
+      category: 'Ground Spices',
+      brandName: 'Rasoi Sutra',
+      shortDescription: '',
+      fullDescription: '',
+      image: '/haldi.jpg',
+      mrp: '',
+      sellingPrice: '',
       stock: '100',
-      weight: '100g, 250g, 500g',
-      ingredients: '100% Raw Spices',
-      featured: false
+      unit: '200g',
+      weight: '200',
+      ingredients: '100% Natural Spices',
+      shelfLife: '12 Months',
+      storageInstructions: 'Store in a cool dry place.',
+      countryOfOrigin: 'India',
+      isBestSeller: false,
+      isFeatured: false,
+      available: true,
+      tags: 'spices, pure'
     });
   };
 
@@ -541,52 +578,76 @@ const AdminDashboard = () => {
                         <input
                           type="text"
                           required
-                          value={productForm.name}
-                          onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                          value={productForm.productName}
+                          onChange={(e) => setProductForm({ ...productForm, productName: e.target.value })}
                           className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Category</label>
                         <select
-                          value={productForm.categoryId}
-                          onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
+                          value={productForm.category}
+                          onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
                           className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
                         >
-                          {categories.map(c => (
-                            <option key={c.id} value={c.id}>{c.categoryName}</option>
-                          ))}
+                          <option value="Ground Spices">Ground Spices</option>
+                          <option value="Whole Spices">Whole Spices</option>
+                          <option value="Spice Blends">Spice Blends</option>
                         </select>
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Description</label>
-                      <textarea
-                        required
-                        value={productForm.description}
-                        onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                        className="w-full h-24 px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Base Price (₹)</label>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Short Description</label>
                         <input
-                          type="number"
+                          type="text"
                           required
-                          value={productForm.price}
-                          onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                          value={productForm.shortDescription}
+                          onChange={(e) => setProductForm({ ...productForm, shortDescription: e.target.value })}
                           className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Discount (₹)</label>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Image URL</label>
+                        <input
+                          type="text"
+                          required
+                          value={productForm.image}
+                          onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Full Description</label>
+                      <textarea
+                        required
+                        value={productForm.fullDescription}
+                        onChange={(e) => setProductForm({ ...productForm, fullDescription: e.target.value })}
+                        className="w-full h-20 px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-6">
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">MRP (₹)</label>
                         <input
                           type="number"
-                          value={productForm.discount}
-                          onChange={(e) => setProductForm({ ...productForm, discount: e.target.value })}
+                          required
+                          value={productForm.mrp}
+                          onChange={(e) => setProductForm({ ...productForm, mrp: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Selling Price (₹)</label>
+                        <input
+                          type="number"
+                          required
+                          value={productForm.sellingPrice}
+                          onChange={(e) => setProductForm({ ...productForm, sellingPrice: e.target.value })}
                           className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
                         />
                       </div>
@@ -600,19 +661,64 @@ const AdminDashboard = () => {
                           className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
                         />
                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Weight Options (comma-sep)</label>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Unit</label>
                         <input
                           type="text"
+                          required
+                          value={productForm.unit}
+                          onChange={(e) => setProductForm({ ...productForm, unit: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                          placeholder="200g"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-6">
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Weight (g)</label>
+                        <input
+                          type="number"
+                          required
                           value={productForm.weight}
                           onChange={(e) => setProductForm({ ...productForm, weight: e.target.value })}
                           className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                          placeholder="100g, 250g, 500g"
                         />
                       </div>
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Shelf Life</label>
+                        <input
+                          type="text"
+                          required
+                          value={productForm.shelfLife}
+                          onChange={(e) => setProductForm({ ...productForm, shelfLife: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Country</label>
+                        <input
+                          type="text"
+                          required
+                          value={productForm.countryOfOrigin}
+                          onChange={(e) => setProductForm({ ...productForm, countryOfOrigin: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Tags (comma-sep)</label>
+                        <input
+                          type="text"
+                          required
+                          value={productForm.tags}
+                          onChange={(e) => setProductForm({ ...productForm, tags: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                          placeholder="spices, pure"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Ingredients (comma-sep)</label>
                         <input
@@ -623,17 +729,48 @@ const AdminDashboard = () => {
                           placeholder="Ingredients list..."
                         />
                       </div>
+                      <div>
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Storage</label>
+                        <input
+                          type="text"
+                          value={productForm.storageInstructions}
+                          onChange={(e) => setProductForm({ ...productForm, storageInstructions: e.target.value })}
+                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
+                        />
+                      </div>
                     </div>
 
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={productForm.featured}
-                        onChange={(e) => setProductForm({ ...productForm, featured: e.target.checked })}
-                        className="accent-[#991B1B]"
-                      />
-                      <span className="text-sm font-bold text-amber-950">Show in Featured Products Section</span>
-                    </label>
+                    <div className="flex flex-wrap gap-6">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={productForm.isFeatured}
+                          onChange={(e) => setProductForm({ ...productForm, isFeatured: e.target.checked })}
+                          className="accent-[#991B1B]"
+                        />
+                        <span className="text-sm font-bold text-amber-950">Featured Product</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={productForm.isBestSeller}
+                          onChange={(e) => setProductForm({ ...productForm, isBestSeller: e.target.checked })}
+                          className="accent-[#991B1B]"
+                        />
+                        <span className="text-sm font-bold text-amber-950">Best Seller</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={productForm.available}
+                          onChange={(e) => setProductForm({ ...productForm, available: e.target.checked })}
+                          className="accent-[#991B1B]"
+                        />
+                        <span className="text-sm font-bold text-amber-950">Available in Stock</span>
+                      </label>
+                    </div>
 
                     <div className="flex gap-4">
                       <button
@@ -662,19 +799,21 @@ const AdminDashboard = () => {
                   <thead>
                     <tr className="bg-[#FAF6F0] text-amber-950 text-xs font-bold uppercase tracking-wider border-b border-amber-900/10">
                       <th className="p-4 pl-6">Spice Name</th>
-                      <th className="p-4">Price</th>
+                      <th className="p-4">Category</th>
+                      <th className="p-4">Selling Price</th>
                       <th className="p-4">Stock</th>
-                      <th className="p-4">Weights</th>
+                      <th className="p-4">Unit</th>
                       <th className="p-4 pr-6 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-amber-900/5 text-sm text-gray-700">
                     {products.map(p => (
                       <tr key={p.id} className="hover:bg-amber-50/20">
-                        <td className="p-4 pl-6 font-bold text-amber-950">{p.name}</td>
-                        <td className="p-4 font-semibold text-[#991B1B]">₹{p.price}</td>
+                        <td className="p-4 pl-6 font-bold text-amber-950">{p.productName}</td>
+                        <td className="p-4 text-xs font-semibold uppercase text-amber-900/60">{p.category}</td>
+                        <td className="p-4 font-semibold text-[#991B1B]">₹{p.sellingPrice}</td>
                         <td className="p-4">{p.stock} units</td>
-                        <td className="p-4 text-xs font-mono">{p.weight ? p.weight.join(', ') : ''}</td>
+                        <td className="p-4 text-xs font-mono">{p.unit}</td>
                         <td className="p-4 pr-6 text-right space-x-2">
                           <button 
                             onClick={() => handleEditProduct(p)}
