@@ -24,6 +24,14 @@ public class JwtUtils {
 
     private Key getSigningKey() {
         byte[] keyBytes = this.jwtSecret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 64) {
+            try {
+                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-512");
+                keyBytes = md.digest(keyBytes);
+            } catch (Exception e) {
+                logger.error("Failed to hash weak JWT secret using SHA-512", e);
+            }
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

@@ -42,8 +42,10 @@ public class AuthController {
 
             JwtResponse jwtResponse = new JwtResponse(jwt, userDetails.getUsername(), role);
             return ResponseEntity.ok(ApiResponse.success("Login successful", jwtResponse));
-        } catch (Exception e) {
+        } catch (org.springframework.security.core.AuthenticationException e) {
             return ResponseEntity.status(401).body(ApiResponse.error("Invalid credentials"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.error("Server authentication error: " + e.getMessage()));
         }
     }
 }
