@@ -3,6 +3,7 @@ package com.rasoisutra.ecom.config;
 import com.rasoisutra.ecom.models.Admin;
 import com.rasoisutra.ecom.models.Category;
 import com.rasoisutra.ecom.models.Product;
+import com.rasoisutra.ecom.models.ProductVariant;
 import com.rasoisutra.ecom.repositories.AdminRepository;
 import com.rasoisutra.ecom.repositories.CategoryRepository;
 import com.rasoisutra.ecom.repositories.ProductRepository;
@@ -77,13 +78,12 @@ public class DataSeeder implements CommandLineRunner {
         haldi.setShortDescription("100% Pure & Natural premium turmeric powder with high curcumin content.");
         haldi.setFullDescription("Sourced from the finest farms, Rasoi Sutra Haldi Powder is ground using low-temperature grinding technology to retain its natural oils, rich golden color, and strong therapeutic value. Curcumin content is tested to ensure maximum health benefits.");
         haldi.setImage("/haldi.jpg");
-        haldi.setGalleryImages(Arrays.asList("/haldi.jpg"));
-        haldi.setMrp(120.0);
-        haldi.setSellingPrice(99.0);
-        haldi.setDiscountPercentage(17.5);
-        haldi.setStock(150);
-        haldi.setUnit("200g");
-        haldi.setWeight(200.0);
+        haldi.setVariants(Arrays.asList(
+            new ProductVariant("100g", 60.0, 50.0, 16.7, 100, "HLD-100"),
+            new ProductVariant("200g", 120.0, 99.0, 17.5, 150, "HLD-200"),
+            new ProductVariant("500g", 280.0, 220.0, 21.4, 80, "HLD-500"),
+            new ProductVariant("1kg", 520.0, 399.0, 23.2, 50, "HLD-1000")
+        ));
         haldi.setIngredients(Arrays.asList("100% Natural Turmeric Rhizomes"));
         haldi.setShelfLife("12 Months");
         haldi.setStorageInstructions("Store in a cool, dry place in an airtight container.");
@@ -104,12 +104,12 @@ public class DataSeeder implements CommandLineRunner {
         chilli.setFullDescription("Expertly sourced, sun-dried Red Chillies ground into a fine powder. It gives your curries a rich, natural red color without any artificial coloring agents. Delivers a perfect balanced taste with mild pungency.");
         chilli.setImage("/chilli.jpg");
         chilli.setGalleryImages(Arrays.asList("/chilli.jpg"));
-        chilli.setMrp(150.0);
-        chilli.setSellingPrice(129.0);
-        chilli.setDiscountPercentage(14.0);
-        chilli.setStock(120);
-        chilli.setUnit("200g");
-        chilli.setWeight(200.0);
+        chilli.setVariants(Arrays.asList(
+            new ProductVariant("100g", 75.0, 65.0, 13.3, 100, "CHL-100"),
+            new ProductVariant("200g", 150.0, 129.0, 14.0, 120, "CHL-200"),
+            new ProductVariant("500g", 340.0, 290.0, 14.7, 70, "CHL-500"),
+            new ProductVariant("1kg", 650.0, 550.0, 15.4, 40, "CHL-1000")
+        ));
         chilli.setIngredients(Arrays.asList("100% Pure Red Chilli"));
         chilli.setShelfLife("12 Months");
         chilli.setStorageInstructions("Keep away from moisture and direct sunlight.");
@@ -130,12 +130,12 @@ public class DataSeeder implements CommandLineRunner {
         garamMasala.setFullDescription("A hand-crafted blend of 15 premium Indian whole spices including green cardamom, cinnamon, cloves, nutmeg, and mace. Perfect for elevating your traditional curries, biryanis, and gravies. Sourced with care, blended to perfection.");
         garamMasala.setImage("/garam_masala.jpg");
         garamMasala.setGalleryImages(Arrays.asList("/garam_masala.jpg"));
-        garamMasala.setMrp(180.0);
-        garamMasala.setSellingPrice(149.0);
-        garamMasala.setDiscountPercentage(17.2);
-        garamMasala.setStock(100);
-        garamMasala.setUnit("200g");
-        garamMasala.setWeight(200.0);
+        garamMasala.setVariants(Arrays.asList(
+            new ProductVariant("100g", 95.0, 79.0, 16.8, 80, "GM-100"),
+            new ProductVariant("200g", 180.0, 149.0, 17.2, 100, "GM-200"),
+            new ProductVariant("500g", 420.0, 350.0, 16.7, 60, "GM-500"),
+            new ProductVariant("1kg", 800.0, 680.0, 15.0, 30, "GM-1000")
+        ));
         garamMasala.setIngredients(Arrays.asList("Cardamom", "Cinnamon", "Cloves", "Nutmeg", "Black Pepper", "Cumin", "Coriander", "Star Anise"));
         garamMasala.setShelfLife("12 Months");
         garamMasala.setStorageInstructions("Store in an airtight container immediately after opening.");
@@ -156,12 +156,12 @@ public class DataSeeder implements CommandLineRunner {
         jeera.setFullDescription("Carefully selected clean, bold cumin seeds (Jeera) from Gujarat's finest crops. It delivers a rich, warm, earthy flavor that is essential for dal tadka, jeera rice, and curries. Naturally sun-dried to keep the oils intact.");
         jeera.setImage("/jeera.jpg");
         jeera.setGalleryImages(Arrays.asList("/jeera.jpg", "/jeera_recipe.jpg"));
-        jeera.setMrp(160.0);
-        jeera.setSellingPrice(135.0);
-        jeera.setDiscountPercentage(15.6);
-        jeera.setStock(180);
-        jeera.setUnit("200g");
-        jeera.setWeight(200.0);
+        jeera.setVariants(Arrays.asList(
+            new ProductVariant("100g", 85.0, 70.0, 17.6, 120, "JR-100"),
+            new ProductVariant("200g", 160.0, 135.0, 15.6, 180, "JR-200"),
+            new ProductVariant("500g", 360.0, 300.0, 16.7, 90, "JR-500"),
+            new ProductVariant("1kg", 700.0, 580.0, 17.1, 50, "JR-1000")
+        ));
         jeera.setIngredients(Arrays.asList("100% Natural Whole Cumin Seeds"));
         jeera.setShelfLife("12 Months");
         jeera.setStorageInstructions("Keep in a dry place to prevent mold.");

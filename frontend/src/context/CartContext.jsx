@@ -13,10 +13,12 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (product, quantity = 1, unitSelected) => {
+    const selectedUnit = unitSelected || (product.variants && product.variants.length > 0 ? product.variants[0].unit : (product.unit || '200g'));
+    const cartItemId = `${product.id}-${selectedUnit}`;
+
     setCartItems(prevItems => {
-      // Find if item with same ID already exists in cart
       const existingItemIndex = prevItems.findIndex(
-        item => item.id === product.id
+        item => item.cartItemId === cartItemId
       );
 
       if (existingItemIndex > -1) {
@@ -24,16 +26,20 @@ export const CartProvider = ({ children }) => {
         updatedItems[existingItemIndex].quantity += quantity;
         return updatedItems;
       } else {
-        const cartItemId = `${product.id}`;
+        const variant = product.variants && product.variants.length > 0
+          ? product.variants.find(v => v.unit === selectedUnit)
+          : null;
+        const price = variant ? variant.sellingPrice : (product.sellingPrice || 0);
+
         return [
           ...prevItems,
           {
             cartItemId,
             id: product.id,
             productName: product.productName,
-            sellingPrice: product.sellingPrice,
+            sellingPrice: price,
             image: product.image,
-            unit: unitSelected || product.unit || '200g',
+            unit: selectedUnit,
             quantity
           }
         ];

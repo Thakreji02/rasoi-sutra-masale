@@ -31,11 +31,9 @@ const AdminDashboard = () => {
     shortDescription: '',
     fullDescription: '',
     image: '/haldi.jpg',
-    mrp: '',
-    sellingPrice: '',
-    stock: '100',
-    unit: '200g',
-    weight: '200',
+    variants: [
+      { unit: '100g', mrp: '60', sellingPrice: '50', stock: '100', sku: '' }
+    ],
     ingredients: '100% Natural Spices',
     shelfLife: '12 Months',
     storageInstructions: 'Store in a cool dry place.',
@@ -200,9 +198,22 @@ const AdminDashboard = () => {
 
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-    
     const ingredientsList = productForm.ingredients.split(',').map(i => i.trim());
     const tagsList = productForm.tags.split(',').map(t => t.trim());
+
+    const parsedVariants = (productForm.variants || []).map(v => {
+      const mrp = parseFloat(v.mrp) || 0.0;
+      const sellingPrice = parseFloat(v.sellingPrice) || 0.0;
+      const discount = mrp && sellingPrice ? Math.max(0, Math.round(((mrp - sellingPrice) / mrp) * 100)) : 0.0;
+      return {
+        unit: v.unit,
+        mrp,
+        sellingPrice,
+        discountPercentage: discount,
+        stock: parseInt(v.stock) || 0,
+        sku: v.sku || ''
+      };
+    });
 
     const productPayload = {
       productName: productForm.productName,
@@ -211,12 +222,7 @@ const AdminDashboard = () => {
       shortDescription: productForm.shortDescription,
       fullDescription: productForm.fullDescription,
       image: productForm.image || '/haldi.jpg',
-      mrp: parseFloat(productForm.mrp),
-      sellingPrice: parseFloat(productForm.sellingPrice),
-      discountPercentage: productForm.mrp && productForm.sellingPrice ? Math.max(0, Math.round(((parseFloat(productForm.mrp) - parseFloat(productForm.sellingPrice)) / parseFloat(productForm.mrp)) * 100)) : 0,
-      stock: parseInt(productForm.stock),
-      unit: productForm.unit,
-      weight: parseFloat(productForm.weight),
+      variants: parsedVariants,
       ingredients: ingredientsList,
       shelfLife: productForm.shelfLife,
       storageInstructions: productForm.storageInstructions,
@@ -258,11 +264,9 @@ const AdminDashboard = () => {
       shortDescription: product.shortDescription || '',
       fullDescription: product.fullDescription || '',
       image: product.image || '',
-      mrp: product.mrp ? product.mrp.toString() : '',
-      sellingPrice: product.sellingPrice ? product.sellingPrice.toString() : '',
-      stock: product.stock ? product.stock.toString() : '100',
-      unit: product.unit || '200g',
-      weight: product.weight ? product.weight.toString() : '200',
+      variants: product.variants || [
+        { unit: '100g', mrp: '60', sellingPrice: '50', stock: '100', sku: '' }
+      ],
       ingredients: product.ingredients ? product.ingredients.join(', ') : '',
       shelfLife: product.shelfLife || '12 Months',
       storageInstructions: product.storageInstructions || 'Store in a cool dry place.',
@@ -340,11 +344,9 @@ const AdminDashboard = () => {
       shortDescription: '',
       fullDescription: '',
       image: '/haldi.jpg',
-      mrp: '',
-      sellingPrice: '',
-      stock: '100',
-      unit: '200g',
-      weight: '200',
+      variants: [
+        { unit: '100g', mrp: '60', sellingPrice: '50', stock: '100', sku: '' }
+      ],
       ingredients: '100% Natural Spices',
       shelfLife: '12 Months',
       storageInstructions: 'Store in a cool dry place.',
@@ -431,7 +433,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setAdminTab('overview')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'overview' ? 'bg-amber-500 text-[#2B1E17]' : 'hover:bg-[#faf6f0]/10 text-[#FAF6F0]/70 hover:text-white'
+                adminTab === 'overview' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
               }`}
             >
               <LayoutDashboard size={18} />
@@ -441,7 +443,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setAdminTab('products')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'products' ? 'bg-amber-500 text-[#2B1E17]' : 'hover:bg-[#faf6f0]/10 text-[#FAF6F0]/70 hover:text-white'
+                adminTab === 'products' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
               }`}
             >
               <Package size={18} />
@@ -451,7 +453,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setAdminTab('orders')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'orders' ? 'bg-amber-500 text-[#2B1E17]' : 'hover:bg-[#faf6f0]/10 text-[#FAF6F0]/70 hover:text-white'
+                adminTab === 'orders' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
               }`}
             >
               <ClipboardList size={18} />
@@ -466,7 +468,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setAdminTab('reviews')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'reviews' ? 'bg-amber-500 text-[#2B1E17]' : 'hover:bg-[#faf6f0]/10 text-[#FAF6F0]/70 hover:text-white'
+                adminTab === 'reviews' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
               }`}
             >
               <MessageSquare size={18} />
@@ -476,7 +478,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setAdminTab('contacts')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'contacts' ? 'bg-amber-500 text-[#2B1E17]' : 'hover:bg-[#faf6f0]/10 text-[#FAF6F0]/70 hover:text-white'
+                adminTab === 'contacts' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
               }`}
             >
               <Mail size={18} />
@@ -629,48 +631,113 @@ const AdminDashboard = () => {
                         className="w-full h-20 px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
                       />
                     </div>
+                    {/* Variants Manager */}
+                    <div className="border border-amber-900/10 p-5 rounded-2xl bg-amber-50/10 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest">Quantity Variants</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVariants = [...(productForm.variants || [])];
+                            newVariants.push({ unit: '100g', mrp: '', sellingPrice: '', stock: '100', sku: '' });
+                            setProductForm({ ...productForm, variants: newVariants });
+                          }}
+                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors"
+                        >
+                          <Plus size={14} /> Add Variant
+                        </button>
+                      </div>
 
-                    <div className="grid grid-cols-4 gap-6">
-                      <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">MRP (₹)</label>
-                        <input
-                          type="number"
-                          required
-                          value={productForm.mrp}
-                          onChange={(e) => setProductForm({ ...productForm, mrp: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Selling Price (₹)</label>
-                        <input
-                          type="number"
-                          required
-                          value={productForm.sellingPrice}
-                          onChange={(e) => setProductForm({ ...productForm, sellingPrice: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Stock</label>
-                        <input
-                          type="number"
-                          required
-                          value={productForm.stock}
-                          onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Unit</label>
-                        <input
-                          type="text"
-                          required
-                          value={productForm.unit}
-                          onChange={(e) => setProductForm({ ...productForm, unit: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                          placeholder="200g"
-                        />
+                      <div className="space-y-3">
+                        {(productForm.variants || []).map((variant, idx) => (
+                          <div key={idx} className="grid grid-cols-5 gap-3 items-end bg-[#FAF6F0] p-3 rounded-xl border border-amber-900/5 relative">
+                            <div>
+                              <label className="block text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-wider mb-1">Unit</label>
+                              <input
+                                type="text"
+                                required
+                                value={variant.unit}
+                                onChange={(e) => {
+                                  const newVariants = [...productForm.variants];
+                                  newVariants[idx].unit = e.target.value;
+                                  setProductForm({ ...productForm, variants: newVariants });
+                                }}
+                                className="w-full px-2.5 py-1.5 bg-white border border-amber-900/10 rounded-lg text-xs focus:outline-none"
+                                placeholder="e.g. 100g, 1kg"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-wider mb-1">MRP (₹)</label>
+                              <input
+                                type="number"
+                                required
+                                value={variant.mrp}
+                                onChange={(e) => {
+                                  const newVariants = [...productForm.variants];
+                                  newVariants[idx].mrp = e.target.value;
+                                  setProductForm({ ...productForm, variants: newVariants });
+                                }}
+                                className="w-full px-2.5 py-1.5 bg-white border border-amber-900/10 rounded-lg text-xs focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-wider mb-1">Price (₹)</label>
+                              <input
+                                type="number"
+                                required
+                                value={variant.sellingPrice}
+                                onChange={(e) => {
+                                  const newVariants = [...productForm.variants];
+                                  newVariants[idx].sellingPrice = e.target.value;
+                                  setProductForm({ ...productForm, variants: newVariants });
+                                }}
+                                className="w-full px-2.5 py-1.5 bg-white border border-amber-900/10 rounded-lg text-xs focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-wider mb-1">Stock</label>
+                              <input
+                                type="number"
+                                required
+                                value={variant.stock}
+                                onChange={(e) => {
+                                  const newVariants = [...productForm.variants];
+                                  newVariants[idx].stock = e.target.value;
+                                  setProductForm({ ...productForm, variants: newVariants });
+                                }}
+                                className="w-full px-2.5 py-1.5 bg-white border border-amber-900/10 rounded-lg text-xs focus:outline-none"
+                              />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1">
+                                <label className="block text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-wider mb-1">SKU</label>
+                                <input
+                                  type="text"
+                                  value={variant.sku || ''}
+                                  onChange={(e) => {
+                                    const newVariants = [...productForm.variants];
+                                    newVariants[idx].sku = e.target.value;
+                                    setProductForm({ ...productForm, variants: newVariants });
+                                  }}
+                                  className="w-full px-2.5 py-1.5 bg-white border border-amber-900/10 rounded-lg text-xs focus:outline-none"
+                                  placeholder="SKU..."
+                                />
+                              </div>
+                              {productForm.variants.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newVariants = productForm.variants.filter((_, i) => i !== idx);
+                                    setProductForm({ ...productForm, variants: newVariants });
+                                  }}
+                                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -811,9 +878,21 @@ const AdminDashboard = () => {
                       <tr key={p.id} className="hover:bg-amber-50/20">
                         <td className="p-4 pl-6 font-bold text-amber-950">{p.productName}</td>
                         <td className="p-4 text-xs font-semibold uppercase text-amber-900/60">{p.category}</td>
-                        <td className="p-4 font-semibold text-[#991B1B]">₹{p.sellingPrice}</td>
-                        <td className="p-4">{p.stock} units</td>
-                        <td className="p-4 text-xs font-mono">{p.unit}</td>
+                        <td className="p-4 font-semibold text-[#991B1B]">
+                          {p.variants && p.variants.length > 0 
+                            ? `₹${p.variants[0].sellingPrice}${p.variants.length > 1 ? '+' : ''}`
+                            : 'N/A'}
+                        </td>
+                        <td className="p-4">
+                          {p.variants && p.variants.length > 0 
+                            ? p.variants.reduce((acc, v) => acc + (v.stock || 0), 0) 
+                            : 0} units
+                        </td>
+                        <td className="p-4 text-xs font-semibold text-amber-900/60">
+                          {p.variants && p.variants.length > 0 
+                            ? p.variants.map(v => v.unit).join(', ') 
+                            : 'N/A'}
+                        </td>
                         <td className="p-4 pr-6 text-right space-x-2">
                           <button 
                             onClick={() => handleEditProduct(p)}

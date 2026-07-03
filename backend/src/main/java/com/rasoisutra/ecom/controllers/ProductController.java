@@ -2,6 +2,7 @@ package com.rasoisutra.ecom.controllers;
 
 import com.rasoisutra.ecom.dto.ApiResponse;
 import com.rasoisutra.ecom.models.Product;
+import com.rasoisutra.ecom.models.ProductVariant;
 import com.rasoisutra.ecom.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -85,12 +86,7 @@ public class ProductController {
         existingProduct.setFullDescription(product.getFullDescription());
         existingProduct.setImage(product.getImage());
         existingProduct.setGalleryImages(product.getGalleryImages());
-        existingProduct.setMrp(product.getMrp());
-        existingProduct.setSellingPrice(product.getSellingPrice());
-        existingProduct.setDiscountPercentage(product.getDiscountPercentage());
-        existingProduct.setStock(product.getStock());
-        existingProduct.setUnit(product.getUnit());
-        existingProduct.setWeight(product.getWeight());
+        existingProduct.setVariants(product.getVariants());
         existingProduct.setIngredients(product.getIngredients());
         existingProduct.setShelfLife(product.getShelfLife());
         existingProduct.setStorageInstructions(product.getStorageInstructions());

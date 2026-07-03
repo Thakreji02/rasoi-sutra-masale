@@ -36,17 +36,7 @@ public class Product {
     
     private List<String> galleryImages = new ArrayList<>();
     
-    private Double mrp;
-    
-    private Double sellingPrice;
-    
-    private Double discountPercentage = 0.0;
-    
-    private Integer stock = 0;
-    
-    private String unit; // e.g., "200g", "500g", "1kg"
-    
-    private Double weight; // weight value in numeric format (e.g. 200)
+    private List<ProductVariant> variants = new ArrayList<>();
     
     private List<String> ingredients = new ArrayList<>();
     

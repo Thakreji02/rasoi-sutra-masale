@@ -5,17 +5,25 @@ import { ShoppingCart, Star } from 'lucide-react';
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   
+  const [selectedVariant, setSelectedVariant] = useState(
+    product.variants && product.variants.length > 0 ? product.variants[0] : null
+  );
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = () => {
-    // Add to cart using the new schema parameters
-    addToCart(product, quantity, product.unit || '200g');
+    addToCart(product, quantity, selectedVariant ? selectedVariant.unit : (product.unit || '200g'));
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const hasDiscount = product.mrp && product.mrp > product.sellingPrice;
+  const mrpVal = selectedVariant ? selectedVariant.mrp : product.mrp;
+  const sellingPriceVal = selectedVariant ? selectedVariant.sellingPrice : product.sellingPrice;
+  const discountPercentageVal = selectedVariant ? selectedVariant.discountPercentage : product.discountPercentage;
+  const stockVal = selectedVariant ? selectedVariant.stock : product.stock;
+  const unitVal = selectedVariant ? selectedVariant.unit : (product.unit || '200g');
+
+  const hasDiscount = mrpVal && mrpVal > sellingPriceVal;
 
   return (
     <div className="bg-white rounded-3xl border border-amber-900/10 overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full group">
@@ -39,12 +47,12 @@ const ProductCard = ({ product }) => {
             Best Seller
           </span>
         )}
-        {product.stock <= 5 && product.stock > 0 && (
+        {stockVal <= 5 && stockVal > 0 && (
           <span className="absolute top-4 right-4 bg-orange-100 text-orange-800 text-[0.65rem] font-extrabold px-2.5 py-1 rounded-lg border border-orange-200">
-            Only {product.stock} left
+            Only {stockVal} left
           </span>
         )}
-        {product.stock === 0 && (
+        {stockVal === 0 && (
           <span className="absolute top-4 right-4 bg-gray-800 text-gray-100 text-[0.65rem] font-extrabold px-2.5 py-1 rounded-lg">
             Sold Out
           </span>
@@ -66,11 +74,32 @@ const ProductCard = ({ product }) => {
         </div>
 
         <h3 className="font-serif font-bold text-lg text-amber-950 group-hover:text-[#991B1B] transition-colors leading-tight">
-          {product.productName} <span className="text-sm font-sans font-normal text-amber-900/60">({product.unit || '200g'})</span>
+          {product.productName} <span className="text-sm font-sans font-normal text-amber-900/60">({unitVal})</span>
         </h3>
         <p className="mt-2 text-xs text-amber-900/60 leading-relaxed line-clamp-3 flex-grow">
           {product.shortDescription}
         </p>
+
+        {/* Quantity Selection Dropdown */}
+        {product.variants && product.variants.length > 0 && (
+          <div className="mt-3">
+            <label className="block text-[0.65rem] font-bold text-amber-900/50 uppercase tracking-wider mb-1">Select Net Weight</label>
+            <select
+              value={selectedVariant ? selectedVariant.unit : ''}
+              onChange={(e) => {
+                const variant = product.variants.find(v => v.unit === e.target.value);
+                setSelectedVariant(variant);
+              }}
+              className="w-full bg-[#FAF6F0] border border-amber-900/10 rounded-xl px-3 py-2 text-xs font-bold text-amber-950 focus:outline-none focus:border-[#991B1B]"
+            >
+              {product.variants.map((variant, idx) => (
+                <option key={idx} value={variant.unit}>
+                  {variant.unit} - ₹{variant.sellingPrice} {variant.stock === 0 ? '(Out of Stock)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Info badges */}
         <div className="mt-4 pt-3 border-t border-amber-900/5 flex justify-between text-[0.65rem] text-amber-900/60 font-semibold">
@@ -83,15 +112,15 @@ const ProductCard = ({ product }) => {
           <div className="flex flex-col">
             {hasDiscount && (
               <span className="text-xs text-amber-900/40 line-through">
-                ₹{product.mrp}
+                ₹{mrpVal}
               </span>
             )}
             <div className="flex items-baseline text-[#991B1B] gap-0.5">
               <span className="text-sm font-semibold">₹</span>
-              <span className="font-sans text-xl font-bold tracking-normal">{product.sellingPrice}</span>
-              {hasDiscount && product.discountPercentage && (
+              <span className="font-sans text-xl font-bold tracking-normal">{sellingPriceVal}</span>
+              {hasDiscount && discountPercentageVal && (
                 <span className="ml-2 text-[0.7rem] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                  {Math.round(product.discountPercentage)}% OFF
+                  {Math.round(discountPercentageVal)}% OFF
                 </span>
               )}
             </div>
@@ -118,7 +147,7 @@ const ProductCard = ({ product }) => {
 
         <button
           onClick={handleAddToCart}
-          disabled={product.stock === 0}
+          disabled={stockVal === 0}
           className={`mt-4 w-full py-3.5 flex items-center justify-center gap-2 font-bold rounded-xl shadow-lg transition-all duration-300 ${
             added 
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/10' 
