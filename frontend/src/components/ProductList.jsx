@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import axiosInstance from '../api/axios';
 import { Filter, SortAsc, Search, AlertCircle, RefreshCw } from 'lucide-react';
@@ -10,8 +11,12 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // URL Search Parameters
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryQuery = searchParams.get('category');
+
   // Filters & Sorting state
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState(categoryQuery || 'All');
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +24,15 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+
+  // Sync category state with URL parameter changes
+  useEffect(() => {
+    if (categoryQuery) {
+      setSelectedCategory(categoryQuery);
+    } else {
+      setSelectedCategory('All');
+    }
+  }, [categoryQuery]);
 
   // Load categories and products on mount
   useEffect(() => {

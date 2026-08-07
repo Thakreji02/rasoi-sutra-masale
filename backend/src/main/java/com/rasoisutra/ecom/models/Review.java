@@ -1,24 +1,28 @@
 package com.rasoisutra.ecom.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-@Document(collection = "reviews")
+@Entity
+@Table(name = "reviews")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
     private String customerName;
     private Integer rating;
+    
+    @Column(columnDefinition = "TEXT")
     private String review;
-    private String productId;
+    
+    private Long productId;
     
     private LocalDateTime createdAt = LocalDateTime.now();
 }

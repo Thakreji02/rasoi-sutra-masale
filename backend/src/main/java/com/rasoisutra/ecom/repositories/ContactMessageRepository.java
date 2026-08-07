@@ -1,12 +1,12 @@
 package com.rasoisutra.ecom.repositories;
 
 import com.rasoisutra.ecom.models.ContactMessage;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ContactMessageRepository extends MongoRepository<ContactMessage, String> {
+public interface ContactMessageRepository extends JpaRepository<ContactMessage, Long> {
     List<ContactMessage> findAllByOrderByCreatedAtDesc();
 }

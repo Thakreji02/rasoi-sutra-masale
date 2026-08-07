@@ -5,8 +5,10 @@ import {
   Package, MessageSquare, Mail, DollarSign, TrendingUp, AlertCircle 
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
+  const { logout } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -191,9 +193,8 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('rasoi_sutra_admin_token');
+    logout();
     setIsLoggedIn(false);
-    toast.info('Logged out from Admin Dashboard.');
   };
 
   const handleProductSubmit = async (e) => {
@@ -422,18 +423,18 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-[#FAF6F0] flex flex-col md:flex-row">
       
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-[#2B1E17] text-[#FAF6F0] shrink-0 flex flex-col justify-between py-8 px-4 border-r border-amber-900/20">
+      <aside className="w-full md:w-64 bg-white text-gray-950 shrink-0 flex flex-col justify-between py-8 px-4 border-r border-amber-900/10 shadow-sm">
         <div className="space-y-8">
           <div className="text-center md:text-left px-4">
-            <h3 className="font-serif font-black text-xl text-amber-400">Admin Control</h3>
-            <span className="text-[0.6rem] font-bold text-[#FAF6F0]/40 uppercase tracking-widest">Rasoi Sutra Masale</span>
+            <h3 className="font-serif font-black text-xl text-amber-950">Admin Control</h3>
+            <span className="text-[0.6rem] font-bold text-amber-900/40 uppercase tracking-widest">Rasoi Sutra Masale</span>
           </div>
 
           <nav className="space-y-1.5">
             <button
               onClick={() => setAdminTab('overview')}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'overview' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-extrabold tracking-wide transition-all ${
+                adminTab === 'overview' ? 'bg-[#991B1B] text-white shadow-md' : 'hover:bg-amber-50 text-gray-800 hover:text-amber-950'
               }`}
             >
               <LayoutDashboard size={18} />
@@ -442,8 +443,8 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setAdminTab('products')}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'products' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-extrabold tracking-wide transition-all ${
+                adminTab === 'products' ? 'bg-[#991B1B] text-white shadow-md' : 'hover:bg-amber-50 text-gray-800 hover:text-amber-950'
               }`}
             >
               <Package size={18} />
@@ -452,8 +453,8 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setAdminTab('orders')}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'orders' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-extrabold tracking-wide transition-all ${
+                adminTab === 'orders' ? 'bg-[#991B1B] text-white shadow-md' : 'hover:bg-amber-50 text-gray-800 hover:text-amber-950'
               }`}
             >
               <ClipboardList size={18} />
@@ -467,8 +468,8 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setAdminTab('reviews')}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'reviews' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-extrabold tracking-wide transition-all ${
+                adminTab === 'reviews' ? 'bg-[#991B1B] text-white shadow-md' : 'hover:bg-amber-50 text-gray-800 hover:text-amber-950'
               }`}
             >
               <MessageSquare size={18} />
@@ -477,8 +478,8 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setAdminTab('contacts')}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold tracking-wide transition-all ${
-                adminTab === 'contacts' ? 'bg-amber-600 text-white shadow-md' : 'hover:bg-[#FAF6F0]/5 text-[#FAF6F0]/80 hover:text-white'
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-extrabold tracking-wide transition-all ${
+                adminTab === 'contacts' ? 'bg-[#991B1B] text-white shadow-md' : 'hover:bg-amber-50 text-gray-800 hover:text-amber-950'
               }`}
             >
               <Mail size={18} />
@@ -487,10 +488,10 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        <div className="pt-6 border-t border-[#FAF6F0]/10 px-4">
+        <div className="pt-6 border-t border-amber-900/10 px-4">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 text-red-400 hover:text-red-300 text-sm font-bold transition-colors w-full py-2"
+            className="flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 text-sm font-bold transition-colors w-full py-2"
           >
             <LogOut size={18} />
             <span>Sign Out</span>
@@ -938,7 +939,7 @@ const AdminDashboard = () => {
                     {orders.map(o => (
                       <tr key={o.id} className="hover:bg-amber-50/20">
                         <td className="p-4 pl-6">
-                          <span className="block font-mono font-bold text-amber-950">#{o.id ? o.id.substring(o.id.length - 6).toUpperCase() : ''}</span>
+                          <span className="block font-mono font-bold text-amber-950">#{o.id ? String(o.id) : ''}</span>
                           <span className="text-[10px] text-gray-400 mt-1 block">{o.orderDate ? new Date(o.orderDate).toLocaleString() : ''}</span>
                         </td>
                         <td className="p-4">

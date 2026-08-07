@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
-import { ArrowLeft, CheckCircle, XCircle, ShoppingBag, Loader2, Home, Briefcase, MapPin } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, ShoppingBag, Loader2, Home, Briefcase, MapPin, Lock } from 'lucide-react';
 import { toast } from 'react-toastify';
+import LoginModal from './LoginModal';
 
 const Checkout = ({ onBackToShop }) => {
   const { cartItems, cartTotal, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -33,31 +37,40 @@ const Checkout = ({ onBackToShop }) => {
   const shippingCharge = cartTotal >= 500 ? 0 : 50; // free shipping over Rs 500
   const grandTotal = cartTotal + shippingCharge;
 
-  // Mock Saved Addresses for selection
-  const savedAddresses = [
-    {
-      id: 'addr_1',
-      label: 'Home',
-      icon: Home,
-      fullName: 'Aarti Sharma',
-      address: 'Flat 405, Gold Heritage, MG Road',
-      city: 'Pune',
-      state: 'Maharashtra',
-      pincode: '411001',
-      mobileNumber: '9876543210'
-    },
-    {
-      id: 'addr_2',
-      label: 'Office',
-      icon: Briefcase,
-      fullName: 'Aarti Sharma',
-      address: 'Plot 12, Phase 3, Hinjewadi IT Park',
-      city: 'Pune',
-      state: 'Maharashtra',
-      pincode: '411057',
-      mobileNumber: '9876543211'
+  const [savedAddresses, setSavedAddresses] = useState([]);
+
+  React.useEffect(() => {
+    const fetchSavedAddresses = async () => {
+      try {
+        const response = await axiosInstance.get('/v1/addresses/my-addresses');
+        if (response.data.success) {
+          const mapped = (response.data.data || []).map((addr, index) => ({
+            id: addr.id,
+            label: index === 0 ? 'Home' : `Address ${index + 1}`,
+            icon: index === 0 ? Home : Briefcase,
+            fullName: addr.recipientName,
+            address: `${addr.buildingDetails || ''} ${addr.street || ''}`.trim(),
+            city: addr.city,
+            state: addr.state,
+            pincode: addr.pincode,
+            mobileNumber: addr.phoneNumber
+          }));
+          setSavedAddresses(mapped);
+        }
+      } catch (error) {
+        console.error('Failed to fetch saved addresses', error);
+      }
+    };
+    if (user) {
+      fetchSavedAddresses();
+      setFormData(prev => ({
+        ...prev,
+        fullName: user.fullName || '',
+        email: user.email || '',
+        mobileNumber: user.mobileNumber || ''
+      }));
     }
-  ];
+  }, [user]);
 
   const handleSelectAddress = (addr) => {
     setFormData({
@@ -140,6 +153,35 @@ const Checkout = ({ onBackToShop }) => {
         quantity: item.quantity
       }));
 
+      // Check if address matches any saved address, else save it
+      let finalAddressId = null;
+      const match = savedAddresses.find(a => 
+        a.address.toLowerCase() === formData.address.toLowerCase() &&
+        a.city.toLowerCase() === formData.city.toLowerCase() &&
+        a.pincode === formData.pincode
+      );
+
+      if (match) {
+        finalAddressId = match.id;
+      } else {
+        try {
+          const saveRes = await axiosInstance.post('/v1/addresses', {
+            recipientName: formData.fullName,
+            buildingDetails: formData.address,
+            street: '',
+            city: formData.city,
+            state: formData.state,
+            pincode: formData.pincode,
+            phoneNumber: formData.mobileNumber
+          });
+          if (saveRes.data.success) {
+            finalAddressId = saveRes.data.data.id;
+          }
+        } catch (err) {
+          console.warn('Failed to save address to profile', err);
+        }
+      }
+
       // Create Order in Spring Boot Backend
       const orderPayload = {
         customerName: formData.fullName,
@@ -149,6 +191,7 @@ const Checkout = ({ onBackToShop }) => {
         city: formData.city,
         state: formData.state,
         pincode: formData.pincode,
+        addressId: finalAddressId,
         orderedItems: orderedItems,
         paymentMethod: formData.paymentMethod
       };
@@ -178,7 +221,7 @@ const Checkout = ({ onBackToShop }) => {
         // Cash on Delivery - Placed directly
         setOrderSuccess({
           id: orderData.id,
-          orderNumber: orderData.id.substring(orderData.id.length - 6).toUpperCase(),
+          orderNumber: typeof orderData.id === 'string' ? orderData.id.substring(orderData.id.length - 6).toUpperCase() : String(orderData.id),
           customerName: orderData.customerName,
           totalAmount: orderData.totalAmount,
           paymentStatus: orderData.paymentStatus,
@@ -189,8 +232,13 @@ const Checkout = ({ onBackToShop }) => {
         setLoading(false);
       } else {
         // Razorpay Online Payment Flow
-        const rzpKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_mockKeyId';
+        let rzpKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_mockKeyId';
         
+        // Handle undefined/null/empty strings gracefully
+        if (!rzpKey || rzpKey === 'undefined' || rzpKey === 'null' || !rzpKey.trim()) {
+          rzpKey = 'rzp_test_mockKeyId';
+        }
+
         if (rzpKey === 'rzp_test_mockKeyId') {
           // Launch local payment simulator modal to bypass Razorpay's API key verification error
           setActiveOrderData(orderData);
@@ -199,91 +247,97 @@ const Checkout = ({ onBackToShop }) => {
           return;
         }
 
-        const isScriptLoaded = await loadRazorpayScript();
-        if (!isScriptLoaded) {
-          toast.error('Failed to load Razorpay Payment Gateway. Check internet connection.');
-          setLoading(false);
-          return;
-        }
+        try {
+          const isScriptLoaded = await loadRazorpayScript();
+          if (!isScriptLoaded) {
+            throw new Error('Failed to load Razorpay SDK script');
+          }
 
-        const options = {
-          key: rzpKey,
-          amount: Math.round(orderData.totalAmount * 100), // Amount in paise
-          currency: 'INR',
-          name: 'Rasoi Sutra',
-          description: 'Premium Aromatic Spices Payment',
-          image: '/logo.jpg',
-          handler: async function (response) {
-            // Payment verified callback from Razorpay
-            if (orderData.id.startsWith('order_offline_')) {
-              setOrderSuccess({
-                id: orderData.id,
-                orderNumber: orderData.id.substring(orderData.id.length - 6).toUpperCase(),
-                customerName: orderData.customerName,
-                totalAmount: orderData.totalAmount,
-                paymentStatus: 'PAID',
-                paymentMethod: 'Simulated Razorpay Online'
-              });
-              clearCart();
-              toast.success('Staging payment successful! Order is processing.');
-              setLoading(false);
-            } else {
-              try {
-                setLoading(true);
-                const verificationPayload = {
-                  razorpayOrderId: response.razorpay_order_id,
-                  razorpayPaymentId: response.razorpay_payment_id,
-                  razorpaySignature: response.razorpay_signature
-                };
+          const options = {
+            key: rzpKey,
+            amount: Math.round(orderData.totalAmount * 100), // Amount in paise
+            currency: 'INR',
+            name: 'Rasoi Sutra',
+            description: 'Premium Aromatic Spices Payment',
+            image: '/logo.jpg',
+            handler: async function (response) {
+              // Payment verified callback from Razorpay
+              if (orderData.id.startsWith('order_offline_')) {
+                setOrderSuccess({
+                  id: orderData.id,
+                  orderNumber: typeof orderData.id === 'string' ? orderData.id.substring(orderData.id.length - 6).toUpperCase() : String(orderData.id),
+                  customerName: orderData.customerName,
+                  totalAmount: orderData.totalAmount,
+                  paymentStatus: 'PAID',
+                  paymentMethod: 'Simulated Razorpay Online'
+                });
+                clearCart();
+                toast.success('Staging payment successful! Order is processing.');
+                setLoading(false);
+              } else {
+                try {
+                  setLoading(true);
+                  const verificationPayload = {
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature
+                  };
 
-                const verifyRes = await axiosInstance.post('/payments/verify', verificationPayload);
-                
-                if (verifyRes.data.success) {
-                  const verifiedOrder = verifyRes.data.data;
-                  setOrderSuccess({
-                    id: verifiedOrder.id,
-                    orderNumber: verifiedOrder.id.substring(verifiedOrder.id.length - 6).toUpperCase(),
-                    customerName: verifiedOrder.customerName,
-                    totalAmount: verifiedOrder.totalAmount,
-                    paymentStatus: 'PAID',
-                    paymentMethod: 'Razorpay Online'
-                  });
-                  clearCart();
-                  toast.success('Payment verified successfully! Order is processing.');
-                } else {
-                  setOrderFailed('Payment signature validation failed on secure servers.');
+                  const verifyRes = await axiosInstance.post('/payments/verify', verificationPayload);
+                  
+                  if (verifyRes.data.success) {
+                    const verifiedOrder = verifyRes.data.data;
+                    setOrderSuccess({
+                      id: verifiedOrder.id,
+                      orderNumber: typeof verifiedOrder.id === 'string' ? verifiedOrder.id.substring(verifiedOrder.id.length - 6).toUpperCase() : String(verifiedOrder.id),
+                      customerName: verifiedOrder.customerName,
+                      totalAmount: verifiedOrder.totalAmount,
+                      paymentStatus: 'PAID',
+                      paymentMethod: 'Razorpay Online'
+                    });
+                    clearCart();
+                    toast.success('Payment verified successfully! Order is processing.');
+                  } else {
+                    setOrderFailed('Payment signature validation failed on secure servers.');
+                  }
+                } catch (err) {
+                  console.error('Payment verification error', err);
+                  setOrderFailed('Connection lost during payment validation. Please contact support.');
+                } finally {
+                  setLoading(false);
                 }
-              } catch (err) {
-                console.error('Payment verification error', err);
-                setOrderFailed('Connection lost during payment validation. Please contact support.');
-              } finally {
+              }
+            },
+            prefill: {
+              name: formData.fullName,
+              email: formData.email,
+              contact: formData.mobileNumber
+            },
+            theme: {
+              color: '#991B1B' // Deep Red spice color
+            },
+            modal: {
+              ondismiss: function () {
+                setOrderFailed('Payment was cancelled by the user.');
                 setLoading(false);
               }
             }
-          },
-          prefill: {
-            name: formData.fullName,
-            email: formData.email,
-            contact: formData.mobileNumber
-          },
-          theme: {
-            color: '#991B1B' // Deep Red spice color
-          },
-          modal: {
-            ondismiss: function () {
-              setOrderFailed('Payment was cancelled by the user.');
-              setLoading(false);
-            }
+          };
+
+          // If it's a real server order, supply the order_id. Otherwise, omit it
+          if (orderData.razorpayOrderId && !orderData.razorpayOrderId.startsWith('order_MOCK_')) {
+            options.order_id = orderData.razorpayOrderId;
           }
-        };
 
-        // If it's a real server order, supply the order_id. Otherwise, omit it
-        if (orderData.razorpayOrderId && !orderData.razorpayOrderId.startsWith('order_MOCK_')) {
-          options.order_id = orderData.razorpayOrderId;
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } catch (gatewayErr) {
+          console.warn('Razorpay SDK failed to open. Falling back to local sandbox simulator...', gatewayErr);
+          toast.info('Razorpay initialization bypassed. Launching local payment simulator modal...');
+          setActiveOrderData(orderData);
+          setShowPaymentSimulator(true);
+          setLoading(false);
         }
-
-        const rzp = new window.Razorpay(options);
-        rzp.open();
       }
 
     } catch (err) {
@@ -307,7 +361,7 @@ const Checkout = ({ onBackToShop }) => {
     if (activeOrderData.id.startsWith('order_offline_')) {
       setOrderSuccess({
         id: activeOrderData.id,
-        orderNumber: activeOrderData.id.substring(activeOrderData.id.length - 6).toUpperCase(),
+        orderNumber: typeof activeOrderData.id === 'string' ? activeOrderData.id.substring(activeOrderData.id.length - 6).toUpperCase() : String(activeOrderData.id),
         customerName: activeOrderData.customerName,
         totalAmount: activeOrderData.totalAmount,
         paymentStatus: 'PAID',
@@ -330,7 +384,7 @@ const Checkout = ({ onBackToShop }) => {
           const verifiedOrder = verifyRes.data.data;
           setOrderSuccess({
             id: verifiedOrder.id,
-            orderNumber: verifiedOrder.id.substring(verifiedOrder.id.length - 6).toUpperCase(),
+            orderNumber: typeof verifiedOrder.id === 'string' ? verifiedOrder.id.substring(verifiedOrder.id.length - 6).toUpperCase() : String(verifiedOrder.id),
             customerName: verifiedOrder.customerName,
             totalAmount: verifiedOrder.totalAmount,
             paymentStatus: 'PAID',
@@ -354,6 +408,38 @@ const Checkout = ({ onBackToShop }) => {
     setShowPaymentSimulator(false);
     setOrderFailed('Simulated Payment Transaction was rejected/failed by simulated user.');
   };
+
+  // Authentication Gate check
+  if (!user) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-20 text-center">
+        <div className="bg-white rounded-3xl border border-amber-900/10 p-10 shadow-lg">
+          <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-5 text-[#991B1B]">
+            <Lock size={28} />
+          </div>
+          <h2 className="text-2xl font-serif font-extrabold text-[#451A03]">Login Required to Order</h2>
+          <p className="text-amber-950/60 text-xs mt-2 max-w-sm mx-auto">
+            To place your order and secure your payment details, you must be logged in to an authenticated account.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => setLoginModalOpen(true)}
+              className="px-8 py-3.5 bg-[#991B1B] hover:bg-[#B91C1C] text-white font-bold rounded-2xl shadow-md transition-all hover:scale-105 cursor-pointer"
+            >
+              Log In / Register
+            </button>
+            <button
+              onClick={onBackToShop}
+              className="px-8 py-3.5 bg-amber-50 hover:bg-amber-100/50 text-[#78350F] font-bold rounded-2xl border border-amber-900/10 transition-all hover:scale-105 cursor-pointer"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+        <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+      </div>
+    );
+  }
 
   // Success view
   if (orderSuccess) {
@@ -477,7 +563,13 @@ const Checkout = ({ onBackToShop }) => {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-amber-900/50">Order Reference:</span>
-                <span className="font-mono font-semibold text-amber-950">{activeOrderData?.id.substring(activeOrderData?.id.length - 8).toUpperCase()}</span>
+                <span className="font-mono font-semibold text-amber-950">
+                  {activeOrderData?.id 
+                    ? (String(activeOrderData.id).length > 8 
+                        ? String(activeOrderData.id).substring(String(activeOrderData.id).length - 8).toUpperCase() 
+                        : String(activeOrderData.id)) 
+                    : 'N/A'}
+                </span>
               </div>
               <div className="flex justify-between border-t border-amber-900/10 pt-2 text-sm">
                 <span className="text-amber-950 font-bold">Amount to Pay:</span>

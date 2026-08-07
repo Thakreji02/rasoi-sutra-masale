@@ -4,10 +4,10 @@ const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'https://rasoi-sutra-masale.onrender.com/api',
 });
 
-// Request interceptor to attach JWT token to admin requests
+// Request interceptor to attach JWT token to authenticated requests
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('rasoi_sutra_admin_token');
+    const token = localStorage.getItem('rasoi_sutra_token') || localStorage.getItem('rasoi_sutra_admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

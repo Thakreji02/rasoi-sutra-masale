@@ -2,7 +2,6 @@ package com.rasoisutra.ecom.controllers;
 
 import com.rasoisutra.ecom.dto.ApiResponse;
 import com.rasoisutra.ecom.models.Product;
-import com.rasoisutra.ecom.models.ProductVariant;
 import com.rasoisutra.ecom.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,7 +51,7 @@ public class ProductController {
 
     // Public API: Get by ID
     @GetMapping("/products/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable String id) {
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
         Product product = productService.getProductById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         return ResponseEntity.ok(ApiResponse.success("Product fetched successfully", product));
@@ -75,7 +74,7 @@ public class ProductController {
 
     // Admin API: Update product
     @PutMapping("/admin/products/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody Product product) {
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product) {
         Product existingProduct = productService.getProductById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
@@ -104,7 +103,7 @@ public class ProductController {
 
     // Admin API: Delete product
     @DeleteMapping("/admin/products/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully"));
     }

@@ -3,6 +3,8 @@ package com.rasoisutra.ecom.services;
 import com.rasoisutra.ecom.dto.OrderRequest;
 import com.rasoisutra.ecom.models.Order;
 import com.rasoisutra.ecom.models.OrderItem;
+import com.rasoisutra.ecom.models.Product;
+import com.rasoisutra.ecom.models.ProductVariant;
 import com.rasoisutra.ecom.repositories.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +27,27 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private ProductService productService;
+
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public List<Order> getAllOrders() {
         return orderRepository.findAllByOrderByOrderDateDesc();
     }
 
-    public Optional<Order> getOrderById(String id) {
+    public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);
+    }
+
+    public List<Order> getOrdersByUserId(Long userId) {
+        return orderRepository.findAllByUserIdOrderByOrderDateDesc(userId);
     }
 
     public Order createOrder(OrderRequest request) {
         Order order = new Order();
+        order.setUserId(request.getUserId());
+        order.setAddressId(request.getAddressId());
         order.setCustomerName(request.getCustomerName());
         order.setEmail(request.getEmail());
         order.setMobile(request.getMobile());
@@ -50,7 +61,26 @@ public class OrderService {
         // Calculations
         double subtotal = 0.0;
         for (OrderItem item : request.getOrderedItems()) {
-            subtotal += item.getPrice() * item.getQuantity();
+            Product product = productService.getProductById(item.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + item.getProductId()));
+            
+            double actualPrice = 0.0;
+            boolean found = false;
+            if (product.getVariants() != null) {
+                for (ProductVariant v : product.getVariants()) {
+                    if (v.getUnit().equalsIgnoreCase(item.getWeightSelected())) {
+                        actualPrice = v.getSellingPrice();
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found && product.getVariants() != null && !product.getVariants().isEmpty()) {
+                actualPrice = product.getVariants().get(0).getSellingPrice();
+            }
+            
+            item.setPrice(actualPrice);
+            subtotal += actualPrice * item.getQuantity();
         }
         order.setSubtotal(subtotal);
         
@@ -77,14 +107,17 @@ public class OrderService {
         return savedOrder;
     }
 
-    public Order updateOrderStatus(String id, String status) {
+    public Order updateOrderStatus(Long id, String status) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         order.setOrderStatus(status);
+        if ("DELIVERED".equalsIgnoreCase(status)) {
+            order.setPaymentStatus("PAID");
+        }
         return orderRepository.save(order);
     }
 
-    public Order updatePaymentStatus(String id, String status, String transactionId) {
+    public Order updatePaymentStatus(Long id, String status, String transactionId) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         order.setPaymentStatus(status);
@@ -122,8 +155,8 @@ public class OrderService {
         
         // Flatten structure for SSE notifications to match Dashboard structure
         var notifyPayload = new Object() {
-            public final String id = order.getId();
-            public final String orderNumber = order.getId() != null ? order.getId().substring(order.getId().length() - 6).toUpperCase() : "NEW";
+            public final String id = order.getId() != null ? String.valueOf(order.getId()) : null;
+            public final String orderNumber = order.getId() != null ? String.valueOf(order.getId()) : "NEW";
             public final String customerName = order.getCustomerName();
             public final Double totalAmount = order.getTotalAmount();
         };

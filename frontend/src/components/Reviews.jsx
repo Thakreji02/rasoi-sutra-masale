@@ -79,18 +79,18 @@ const Reviews = () => {
   };
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF6F0]">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#fffdfa]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-sm font-semibold tracking-wider text-[#991B1B] uppercase bg-red-50 px-3 py-1 rounded-full border border-red-100">Testimonials</span>
-          <h2 className="text-4xl sm:text-5xl font-serif font-extrabold text-[#451A03] mt-4">Loved by Home Chefs</h2>
-          <div className="w-16 h-1 bg-amber-600 mx-auto mt-4 rounded-full"></div>
+          <span className="text-sm font-semibold tracking-wider text-[#235e32] uppercase bg-[#e3eedf] px-3 py-1 rounded-full border border-[#cfe4be]">Testimonials</span>
+          <h2 className="text-4xl sm:text-5xl font-serif font-extrabold text-[#2e1c13] mt-4">Loved by Home Chefs</h2>
+          <div className="w-16 h-1 bg-emerald-600 mx-auto mt-4 rounded-full"></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Review Form */}
-          <div className="lg:col-span-5 bg-white rounded-3xl border border-amber-900/10 p-6 md:p-8 shadow-xl shadow-amber-900/5">
-            <div className="flex items-center gap-2 text-[#991B1B] mb-2">
+          <div className="lg:col-span-5 bg-white rounded-3xl border border-amber-900/5 p-6 md:p-8 shadow-xl shadow-amber-900/5">
+            <div className="flex items-center gap-2 text-[#df432b] mb-2">
               <MessageSquarePlus size={22} />
               <h3 className="text-xl font-bold text-amber-950">Share Your Taste Experience</h3>
             </div>
@@ -112,7 +112,7 @@ const Reviews = () => {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl text-sm font-medium focus:outline-none focus:border-[#991B1B]"
+                    className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl text-sm font-medium focus:outline-none focus:border-[#df432b]"
                     placeholder="E.g., Aarti Sharma"
                     required
                   />
@@ -142,7 +142,7 @@ const Reviews = () => {
                     id="reviewText"
                     value={formData.reviewText}
                     onChange={(e) => setFormData({ ...formData, reviewText: e.target.value })}
-                    className="w-full h-28 px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl text-sm font-medium focus:outline-none focus:border-[#991B1B] resize-none"
+                    className="w-full h-28 px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl text-sm font-medium focus:outline-none focus:border-[#df432b] resize-none"
                     placeholder="Write your experience with our masala..."
                     required
                   ></textarea>
@@ -150,7 +150,7 @@ const Reviews = () => {
 
                 <button 
                   type="submit" 
-                  className="w-full py-4 bg-gradient-to-r from-amber-500 to-[#78350F] hover:from-[#78350F] hover:to-[#451A03] text-white font-bold rounded-2xl shadow-lg transition-all"
+                  className="w-full py-4 bg-[#df432b] hover:bg-[#b92f18] text-white font-bold rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer"
                 >
                   Publish Review
                 </button>
@@ -168,7 +168,7 @@ const Reviews = () => {
             )}
             
             {reviews.length === 0 ? (
-              <div className="text-center py-16 bg-white border border-amber-900/10 rounded-3xl">
+              <div className="text-center py-16 bg-white border border-amber-900/5 rounded-3xl">
                 <p className="text-amber-950/40 font-bold">No reviews added yet. Be the first to share your experience!</p>
               </div>
             ) : (
@@ -179,12 +179,12 @@ const Reviews = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: Math.min(idx * 0.05, 0.4) }}
-                    className="bg-white rounded-3xl border border-amber-900/10 p-6 shadow-sm hover:shadow-md transition-shadow pt-6 first:pt-6"
+                    className="bg-white rounded-3xl border border-amber-900/5 p-6 shadow-sm hover:shadow-md transition-shadow pt-6 first:pt-6"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h4 className="font-bold text-sm text-amber-950">{rev.customerName}</h4>
-                        <span className="text-[10px] text-amber-900/40">Verified Buyer</span>
+                        <span className="inline-block text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full mt-1">Verified Buyer</span>
                       </div>
                       <div className="flex text-amber-500">
                         {Array.from({ length: 5 }).map((_, i) => (

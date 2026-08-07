@@ -23,7 +23,7 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews/product/{productId}")
-    public ResponseEntity<?> getReviewsByProduct(@PathVariable String productId) {
+    public ResponseEntity<?> getReviewsByProduct(@PathVariable Long productId) {
         List<Review> reviews = reviewService.getReviewsByProduct(productId);
         return ResponseEntity.ok(ApiResponse.success("Reviews for product fetched successfully", reviews));
     }
@@ -35,7 +35,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/admin/reviews/{id}")
-    public ResponseEntity<?> deleteReview(@PathVariable String id) {
+    public ResponseEntity<?> deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id);
         return ResponseEntity.ok(ApiResponse.success("Review deleted successfully"));
     }

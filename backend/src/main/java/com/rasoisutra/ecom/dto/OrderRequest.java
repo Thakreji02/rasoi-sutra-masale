@@ -14,6 +14,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest {
+    private Long userId;
+    private Long addressId;
     @NotBlank(message = "Customer name is required")
     private String customerName;
     

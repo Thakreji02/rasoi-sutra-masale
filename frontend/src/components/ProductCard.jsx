@@ -26,9 +26,9 @@ const ProductCard = ({ product }) => {
   const hasDiscount = mrpVal && mrpVal > sellingPriceVal;
 
   return (
-    <div className="bg-white rounded-3xl border border-amber-900/10 overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full group">
+    <div className="bg-white rounded-3xl border border-amber-900/5 overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full group">
       {/* Product Image Box */}
-      <div className="relative h-56 overflow-hidden bg-amber-50/20 flex items-center justify-center">
+      <div className="relative h-56 overflow-hidden bg-gradient-to-br from-[#f7f8ed] to-[#eef4e7] flex items-center justify-center">
         <img 
           src={product.image || '/hero_spices.jpg'}
           onError={(e) => {
@@ -39,11 +39,11 @@ const ProductCard = ({ product }) => {
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
         />
-        <span className="absolute top-4 left-4 bg-[#991B1B] text-amber-100 text-[0.65rem] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+        <span className="absolute top-4 left-4 bg-[#df432b] text-white text-[0.65rem] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
           {product.brandName || 'Rasoi Sutra'}
         </span>
         {product.isBestSeller && (
-          <span className="absolute bottom-4 left-4 bg-amber-500 text-amber-950 text-[0.65rem] font-extrabold px-2.5 py-1 rounded-lg shadow-sm">
+          <span className="absolute bottom-4 left-4 bg-[#eb4a34] text-white text-[0.65rem] font-extrabold px-2.5 py-1 rounded-lg shadow-sm">
             Best Seller
           </span>
         )}
@@ -62,7 +62,7 @@ const ProductCard = ({ product }) => {
       {/* Product Details */}
       <div className="p-6 flex flex-col flex-grow">
         <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="text-[0.7rem] font-extrabold uppercase tracking-widest text-[#B45309] bg-amber-50 px-2.5 py-0.5 rounded-md">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-widest text-[#4f873d] bg-[#e4efdf] px-2.5 py-0.5 rounded-md">
             {product.category}
           </span>
           {product.rating && (
@@ -73,7 +73,7 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        <h3 className="font-serif font-bold text-lg text-amber-950 group-hover:text-[#991B1B] transition-colors leading-tight">
+        <h3 className="font-serif font-bold text-lg text-amber-950 group-hover:text-[#df432b] transition-colors leading-tight">
           {product.productName} <span className="text-sm font-sans font-normal text-amber-900/60">({unitVal})</span>
         </h3>
         <p className="mt-2 text-xs text-amber-900/60 leading-relaxed line-clamp-3 flex-grow">
@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
                 const variant = product.variants.find(v => v.unit === e.target.value);
                 setSelectedVariant(variant);
               }}
-              className="w-full bg-[#FAF6F0] border border-amber-900/10 rounded-xl px-3 py-2 text-xs font-bold text-amber-950 focus:outline-none focus:border-[#991B1B]"
+              className="w-full bg-[#fbf6ec] border border-amber-900/10 rounded-xl px-3 py-2 text-xs font-bold text-amber-950 focus:outline-none focus:border-[#df432b]"
             >
               {product.variants.map((variant, idx) => (
                 <option key={idx} value={variant.unit}>
@@ -111,15 +111,15 @@ const ProductCard = ({ product }) => {
         <div className="mt-4 pt-4 border-t border-amber-900/5 flex items-center justify-between">
           <div className="flex flex-col">
             {hasDiscount && (
-              <span className="text-xs text-amber-900/40 line-through">
+              <span className="text-xs text-[#e12626] line-through">
                 ₹{mrpVal}
               </span>
             )}
-            <div className="flex items-baseline text-[#991B1B] gap-0.5">
+            <div className="flex items-baseline text-[#168329] gap-0.5">
               <span className="text-sm font-semibold">₹</span>
               <span className="font-sans text-xl font-bold tracking-normal">{sellingPriceVal}</span>
               {hasDiscount && discountPercentageVal && (
-                <span className="ml-2 text-[0.7rem] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                <span className="ml-2 text-[0.7rem] font-bold text-white bg-[#eb4a34] px-1.5 py-0.5 rounded-full shadow-sm">
                   {Math.round(discountPercentageVal)}% OFF
                 </span>
               )}
@@ -130,7 +130,7 @@ const ProductCard = ({ product }) => {
             <button 
               type="button"
               onClick={() => setQuantity(q => Math.max(1, q - 1))}
-              className="w-8 h-8 flex items-center justify-center text-[#991B1B] font-bold hover:bg-amber-50 transition-colors"
+              className="w-8 h-8 flex items-center justify-center text-[#df432b] font-bold hover:bg-amber-50 transition-colors"
             >
               -
             </button>
@@ -138,7 +138,7 @@ const ProductCard = ({ product }) => {
             <button 
               type="button"
               onClick={() => setQuantity(q => q + 1)}
-              className="w-8 h-8 flex items-center justify-center text-[#991B1B] font-bold hover:bg-amber-50 transition-colors"
+              className="w-8 h-8 flex items-center justify-center text-[#df432b] font-bold hover:bg-amber-50 transition-colors"
             >
               +
             </button>
@@ -148,11 +148,11 @@ const ProductCard = ({ product }) => {
         <button
           onClick={handleAddToCart}
           disabled={stockVal === 0}
-          className={`mt-4 w-full py-3.5 flex items-center justify-center gap-2 font-bold rounded-xl shadow-lg transition-all duration-300 ${
+          className={`mt-4 w-full py-3.5 flex items-center justify-center gap-2 font-bold rounded-xl shadow-md transition-all duration-300 ${
             added 
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/10' 
-              : 'bg-gradient-to-r from-[#991B1B] to-[#B91C1C] hover:from-[#B91C1C] hover:to-[#DC2626] text-white shadow-red-900/10 hover:shadow-xl'
-          } disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:border-transparent`}
+              : 'bg-[#f2f8ec] hover:bg-[#df432b] border border-[#cfe4be] hover:border-[#df432b] text-[#4d7f38] hover:text-white shadow-sm'
+          } disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none disabled:border-transparent`}
         >
           <ShoppingCart size={16} />
           {added ? 'Added to Cart!' : 'Add to Cart'}

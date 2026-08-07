@@ -7,22 +7,30 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Entity
-@Table(name = "contact_messages")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_users_mobile_number", columnList = "mobileNumber", unique = true)
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactMessage {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String name;
-    private String email;
-    private String phone;
-    private String subject;
+    @Column(nullable = false)
+    private String fullName;
     
-    @Column(columnDefinition = "TEXT")
-    private String message;
+    @Column(nullable = false)
+    private String mobileNumber;
+    
+    @Column(nullable = false)
+    private String email;
+    
+    @Column(nullable = false)
+    private String passwordHash;
+    
+    private String role = "ROLE_USER";
     
     private LocalDateTime createdAt = LocalDateTime.now();
 }

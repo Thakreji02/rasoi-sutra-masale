@@ -41,7 +41,8 @@ public class PaymentService {
             // Razorpay expects amount in paise (1 INR = 100 paise)
             orderRequest.put("amount", Math.round(order.getTotalAmount() * 100));
             orderRequest.put("currency", "INR");
-            orderRequest.put("receipt", "rcpt_" + order.getId().substring(order.getId().length() - 8));
+            String orderIdStr = String.valueOf(order.getId());
+            orderRequest.put("receipt", "rcpt_" + (orderIdStr.length() > 8 ? orderIdStr.substring(orderIdStr.length() - 8) : orderIdStr));
             orderRequest.put("payment_capture", 1); // Auto capture
 
             com.razorpay.Order razorpayOrder = razorpay.orders.create(orderRequest);

@@ -29,7 +29,7 @@ public class ContactController {
     }
 
     @DeleteMapping("/admin/contacts/{id}")
-    public ResponseEntity<?> deleteMessage(@PathVariable String id) {
+    public ResponseEntity<?> deleteMessage(@PathVariable Long id) {
         contactService.deleteMessage(id);
         return ResponseEntity.ok(ApiResponse.success("Contact message deleted successfully"));
     }

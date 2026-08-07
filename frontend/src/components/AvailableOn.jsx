@@ -70,15 +70,15 @@ const AvailableOn = () => {
   ];
 
   return (
-    <div className="py-20 px-4 bg-gradient-to-b from-amber-50/50 to-orange-50/20">
+    <div className="py-20 px-4 bg-gradient-to-b from-[#FAF6F0] to-[#fffdfa]">
       <div className="max-w-6xl mx-auto text-center">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="text-sm font-semibold tracking-wider text-[#991B1B] uppercase bg-red-50 px-3 py-1 rounded-full border border-red-100">Partner Channels</span>
-          <h2 className="text-4xl md:text-5xl font-serif font-extrabold mt-4 text-[#451A03]">Available on Marketplaces</h2>
+          <span className="text-sm font-semibold tracking-wider text-[#235e32] uppercase bg-[#e3eedf] px-3 py-1 rounded-full border border-[#cfe4be]">Partner Channels</span>
+          <h2 className="text-4xl md:text-5xl font-serif font-extrabold mt-4 text-[#2e1c13]">Available on Marketplaces</h2>
           <p className="mt-4 text-sm text-amber-900/60 max-w-2xl mx-auto leading-relaxed">
             Can't wait for delivery? Purchase our authentic, hand-ground spices on your favorite grocery platforms with official brand guarantees.
           </p>
@@ -113,7 +113,7 @@ const AvailableOn = () => {
                   href={platform.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-full py-3.5 bg-gradient-to-r from-[#991B1B] to-[#B91C1C] hover:from-[#B91C1C] hover:to-[#DC2626] text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group text-sm"
+                  className="flex items-center justify-center w-full py-3.5 bg-[#df432b] hover:bg-[#b92f18] text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group text-sm cursor-pointer"
                 >
                   <ShoppingBag size={16} className="mr-2 group-hover:scale-110 transition-transform" />
                   {platform.buttonText}
@@ -125,17 +125,17 @@ const AvailableOn = () => {
         </div>
 
         {/* Brand Promise Section */}
-        <div className="mt-16 bg-gradient-to-r from-amber-900 to-[#78350F] text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden text-left flex flex-col md:flex-row items-center justify-between">
+        <div className="mt-16 bg-gradient-to-r from-[#173f27] to-[#235e32] text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden text-left flex flex-col md:flex-row items-center justify-between">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
           <div className="relative z-10 max-w-xl">
-            <h4 className="text-lg font-bold text-amber-300 font-serif">Why buy from our partners?</h4>
-            <p className="mt-2 text-amber-100 text-xs md:text-sm leading-relaxed">
-              We list directly on major online marketplaces. We guarantee that all products shipped through our channels are 100% authentic, fresh, and undergo the same strict quality checks as our factory orders.
+            <h4 className="text-lg font-bold text-[#f3cc76] font-serif">Why buy from our partners?</h4>
+            <p className="mt-2 text-[#FAF6F0]/80 text-xs md:text-sm leading-relaxed">
+              We list directly on major online marketplaces. We guarantee that all products shipped through our channels are 100% fresh, authentic, and undergo the same strict quality checks as our factory orders.
             </p>
           </div>
           <div className="mt-6 md:mt-0 relative z-10 flex flex-col items-center md:items-end">
-            <span className="text-4xl font-extrabold text-amber-300">100%</span>
-            <span className="text-[10px] uppercase tracking-wider text-amber-200 mt-1 font-bold">Authentic Guarantee</span>
+            <span className="text-4xl font-extrabold text-[#f3cc76]">100%</span>
+            <span className="text-[10px] uppercase tracking-wider text-[#FAF6F0]/80 mt-1 font-bold">Authentic Guarantee</span>
           </div>
         </div>
       </div>

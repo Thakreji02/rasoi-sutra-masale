@@ -58,6 +58,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index.html").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/products", "/api/products/**").permitAll()
                 .requestMatchers("/api/categories", "/api/categories/**").permitAll()
                 .requestMatchers("/api/reviews", "/api/reviews/**").permitAll()
@@ -65,6 +66,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/orders/checkout").permitAll()
                 .requestMatchers("/api/orders/stream").permitAll() // Admin SSE stream
                 .requestMatchers("/api/payments/**").permitAll()
+                .requestMatchers("/api/v1/addresses/**").authenticated()
+                .requestMatchers("/api/v1/orders/**").authenticated()
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             );

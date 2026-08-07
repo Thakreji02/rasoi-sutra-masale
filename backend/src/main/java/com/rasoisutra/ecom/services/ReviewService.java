@@ -18,7 +18,7 @@ public class ReviewService {
         return reviewRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    public List<Review> getReviewsByProduct(String productId) {
+    public List<Review> getReviewsByProduct(Long productId) {
         return reviewRepository.findByProductIdOrderByCreatedAtDesc(productId);
     }
 
@@ -27,7 +27,7 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public void deleteReview(String id) {
+    public void deleteReview(Long id) {
         reviewRepository.deleteById(id);
     }
 }

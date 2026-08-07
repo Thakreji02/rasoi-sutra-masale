@@ -23,7 +23,7 @@ public class ContactService {
         return contactMessageRepository.save(message);
     }
 
-    public void deleteMessage(String id) {
+    public void deleteMessage(Long id) {
         contactMessageRepository.deleteById(id);
     }
 }

@@ -48,9 +48,9 @@ public class DataSeeder implements CommandLineRunner {
         Admin admin = new Admin();
         admin.setUsername("admin");
         admin.setRole("ROLE_ADMIN");
-        admin.setEncryptedPassword(passwordEncoder.encode("RasoiSutra2026"));
+        admin.setEncryptedPassword(passwordEncoder.encode("rasoi_sutra_admin2026"));
         adminRepository.save(admin);
-        logger.info("New admin account seeded successfully with password: RasoiSutra2026");
+        logger.info("New admin account seeded successfully with password: rasoi_sutra_admin2026");
     }
 
     private void seedCategoriesAndProducts() {

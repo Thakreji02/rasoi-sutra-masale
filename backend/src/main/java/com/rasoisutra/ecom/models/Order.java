@@ -1,7 +1,6 @@
 package com.rasoisutra.ecom.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,22 +8,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-@Document(collection = "orders")
+@Entity
+@Table(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private Long userId; // Nullable to support guest checkout if required, or linked to logged-in user
+    private Long addressId; // Foreign key referencing saved address (optional)
     
     private String customerName;
     private String email;
     private String mobile;
+    
+    @Column(columnDefinition = "TEXT")
     private String address;
+    
     private String city;
     private String state;
     private String pincode;
     
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id")
     private List<OrderItem> orderedItems = new ArrayList<>();
     
     private String paymentMethod;
