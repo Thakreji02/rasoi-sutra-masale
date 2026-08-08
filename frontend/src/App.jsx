@@ -1,5 +1,5 @@
-import React, { useState, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Link, useLocation, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
@@ -22,6 +22,21 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const OurStory = lazy(() => import('./components/OurStory'));
 const LabReports = lazy(() => import('./components/LabReports'));
 const OurProcess = lazy(() => import('./components/OurProcess'));
+
+// Automatically scrolls to top whenever user changes route or visits a URL
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant'
+    });
+  }, [pathname]);
+
+  return null;
+}
 
 const LoadingFallback = () => (
   <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
@@ -189,16 +204,15 @@ function AppContent() {
   const handleProceedToCheckout = () => {
     setCartOpen(false);
     navigate('/checkout');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToShop = () => {
     navigate('/products');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFBF7]">
+      <ScrollToTop />
       <Navbar onCartToggle={toggleCart} />
 
       <main className="flex-grow">
@@ -217,6 +231,8 @@ function AppContent() {
             <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/login" element={<AdminDashboard />} />
+            {/* Catch-all fallback: any unhandled or mistyped URL redirects directly to Home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </main>
