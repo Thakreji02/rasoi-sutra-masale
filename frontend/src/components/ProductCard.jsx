@@ -2,6 +2,29 @@ import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Star } from 'lucide-react';
 
+const CLOUDINARY_IMAGES = {
+  turmeric: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171368/rasoi-sutra/products/turmeric_powder.jpg',
+  haldi: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171368/rasoi-sutra/products/turmeric_powder.jpg',
+  chilli: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171369/rasoi-sutra/products/red_chilli_powder.jpg',
+  mirch: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171369/rasoi-sutra/products/red_chilli_powder.jpg',
+  coriander: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171370/rasoi-sutra/products/coriander_powder.jpg',
+  dhaniya: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171370/rasoi-sutra/products/coriander_powder.jpg',
+  cumin: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171370/rasoi-sutra/products/cumin_powder.jpg',
+  jeera: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171370/rasoi-sutra/products/cumin_powder.jpg',
+  garam: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171371/rasoi-sutra/products/garam_masala.jpg',
+  pepper: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171372/rasoi-sutra/products/black_pepper_powder.jpg',
+  kali: 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171372/rasoi-sutra/products/black_pepper_powder.jpg'
+};
+
+const resolveProductImage = (p) => {
+  if (p && p.image && p.image.startsWith('http')) return p.image;
+  const str = `${p?.productName || ''} ${p?.slug || ''} ${p?.image || ''}`.toLowerCase();
+  for (const [key, url] of Object.entries(CLOUDINARY_IMAGES)) {
+    if (str.includes(key)) return url;
+  }
+  return p?.image || 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171368/rasoi-sutra/products/turmeric_powder.jpg';
+};
+
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   
@@ -24,20 +47,21 @@ const ProductCard = ({ product }) => {
   const unitVal = selectedVariant ? selectedVariant.unit : (product.unit || '200g');
 
   const hasDiscount = mrpVal && mrpVal > sellingPriceVal;
+  const resolvedImg = resolveProductImage(product);
 
   return (
     <div className="bg-white rounded-3xl border border-amber-900/5 overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full group">
       {/* Product Image Box */}
-      <div className="relative h-56 overflow-hidden bg-gradient-to-br from-[#f7f8ed] to-[#eef4e7] flex items-center justify-center">
+      <div className="relative h-64 overflow-hidden bg-gradient-to-br from-[#f7f8ed] to-[#eef4e7] flex items-center justify-center p-2">
         <img 
-          src={product.image || '/hero_spices.jpg'}
+          src={resolvedImg}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/hero_spices.jpg';
+            e.target.src = 'https://res.cloudinary.com/ezfi6qwa/image/upload/v1786171368/rasoi-sutra/products/turmeric_powder.jpg';
           }}
           alt={product.productName} 
           loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" 
         />
         <span className="absolute top-4 left-4 bg-[#df432b] text-white text-[0.65rem] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
           {product.brandName || 'Rasoi Sutra'}

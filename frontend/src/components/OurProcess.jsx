@@ -167,7 +167,7 @@ const OurProcess = () => {
           </div>
           <div className="relative z-10 mt-6 md:mt-0">
             <a 
-              href="https://wa.me/919999999999?text=Namaste%20Rasoi%20Sutra%2C%20I%20am%20a%20spice%20farmer%20and%20would%20like%20to%20discuss%20selling%20my%20crop."
+              href="https://wa.me/919669349555?text=Namaste%20Rasoi%20Sutra%2C%20I%20am%20a%20spice%20farmer%20and%20would%20like%20to%20discuss%20selling%20my%20crop."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-4 bg-[#df432b] hover:bg-[#b92f18] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-transform hover:scale-105"

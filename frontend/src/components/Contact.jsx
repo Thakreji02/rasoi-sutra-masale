@@ -78,7 +78,7 @@ const Contact = () => {
                 <div>
                   <h4 className="font-bold text-gray-800 text-sm">Call / WhatsApp Support</h4>
                   <p className="text-gray-500 text-xs mt-1 leading-relaxed">
-                    +91 98765 43210 (Mon-Sat, 9:00 AM - 6:00 PM)
+                    <a href="tel:+919669349555" className="hover:text-[#df432b] font-semibold text-gray-700 transition-colors">+91 96693 49555</a> (Mon-Sat, 9:00 AM - 6:00 PM)
                   </p>
                 </div>
               </div>

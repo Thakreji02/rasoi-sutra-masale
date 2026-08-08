@@ -30,9 +30,9 @@ razorpay:
 
 # Cloudinary Configuration
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:defaultCloudName}
-  api-key: ${CLOUDINARY_API_KEY:defaultApiKey}
-  api-secret: ${CLOUDINARY_API_SECRET:defaultApiSecret}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:ezfi6qwa}
+  api-key: ${CLOUDINARY_API_KEY:145736831222146}
+  api-secret: ${CLOUDINARY_API_SECRET:iswo5_QylaPaNC_kRdotTZ2Z1yc}
 
 # Logging Configuration
 logging:

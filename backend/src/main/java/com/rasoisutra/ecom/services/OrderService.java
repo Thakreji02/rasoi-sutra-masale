@@ -58,29 +58,33 @@ public class OrderService {
         order.setOrderedItems(request.getOrderedItems());
         order.setPaymentMethod(request.getPaymentMethod());
 
-        // Calculations
+        // Calculations with server-side validation
         double subtotal = 0.0;
         for (OrderItem item : request.getOrderedItems()) {
-            Product product = productService.getProductById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + item.getProductId()));
-            
-            double actualPrice = 0.0;
-            boolean found = false;
-            if (product.getVariants() != null) {
-                for (ProductVariant v : product.getVariants()) {
-                    if (v.getUnit().equalsIgnoreCase(item.getWeightSelected())) {
-                        actualPrice = v.getSellingPrice();
-                        found = true;
-                        break;
+            double actualPrice = item.getPrice() != null ? item.getPrice() : 0.0;
+            if (item.getProductId() != null) {
+                Optional<Product> optProduct = productService.getProductById(item.getProductId());
+                if (optProduct.isPresent()) {
+                    Product product = optProduct.get();
+                    boolean found = false;
+                    if (product.getVariants() != null) {
+                        for (ProductVariant v : product.getVariants()) {
+                            if (v.getUnit() != null && v.getUnit().equalsIgnoreCase(item.getWeightSelected())) {
+                                actualPrice = v.getSellingPrice();
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found && product.getVariants() != null && !product.getVariants().isEmpty()) {
+                        actualPrice = product.getVariants().get(0).getSellingPrice();
                     }
                 }
             }
-            if (!found && product.getVariants() != null && !product.getVariants().isEmpty()) {
-                actualPrice = product.getVariants().get(0).getSellingPrice();
-            }
             
             item.setPrice(actualPrice);
-            subtotal += actualPrice * item.getQuantity();
+            int qty = item.getQuantity() != null && item.getQuantity() > 0 ? item.getQuantity() : 1;
+            subtotal += actualPrice * qty;
         }
         order.setSubtotal(subtotal);
         

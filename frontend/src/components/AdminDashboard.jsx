@@ -45,6 +45,33 @@ const AdminDashboard = () => {
     tags: 'spices, pure'
   });
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'products');
+
+    setUploadingImage(true);
+    try {
+      const res = await axiosInstance.post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data && res.data.url) {
+        setProductForm(prev => ({ ...prev, image: res.data.url }));
+        toast.success('Image uploaded to Cloudinary CDN successfully! ☁️');
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+      toast.error('Failed to upload image to Cloudinary.');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   useEffect(() => {
     // Check local storage for persistent token
     const savedToken = localStorage.getItem('rasoi_sutra_admin_token');
@@ -612,14 +639,40 @@ const AdminDashboard = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest mb-2">Image URL</label>
-                        <input
-                          type="text"
-                          required
-                          value={productForm.image}
-                          onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none"
-                        />
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-xs font-bold text-amber-950 uppercase tracking-widest">
+                            Product Image (Cloudinary CDN)
+                          </label>
+                          {uploadingImage && (
+                            <span className="text-xs text-amber-700 font-bold animate-pulse">Uploading to Cloudinary... ☁️</span>
+                          )}
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="text"
+                            required
+                            value={productForm.image}
+                            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                            className="w-full px-4 py-3 bg-[#FAF6F0] border border-amber-900/10 rounded-xl focus:outline-none text-xs"
+                            placeholder="https://res.cloudinary.com/..."
+                          />
+                          <label className="px-4 py-3 bg-[#df432b] hover:bg-[#b92f18] text-white rounded-xl text-xs font-bold cursor-pointer shrink-0 transition-colors flex items-center gap-1.5 shadow-sm">
+                            <span>Upload File</span>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={handleFileUpload} 
+                              disabled={uploadingImage}
+                            />
+                          </label>
+                        </div>
+                        {productForm.image && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <img src={productForm.image} alt="Preview" className="h-10 w-10 rounded-lg object-cover border border-amber-900/10 shadow-sm" />
+                            <span className="text-[11px] text-gray-500 truncate max-w-xs">{productForm.image}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 

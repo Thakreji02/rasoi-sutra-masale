@@ -170,14 +170,6 @@ const Navbar = ({ onCartToggle }) => {
                         </div>
                       </Link>
                     </div>
-
-                    <Link 
-                      to="/products" 
-                      className="flex items-center justify-between gap-4 mt-3 p-3.5 rounded-2xl bg-[#173f27] hover:bg-[#235e32] text-white transition-colors duration-200 text-xs font-bold shadow-sm"
-                    >
-                      <span className="font-serif">Start with the Everyday Kitchen Combo</span>
-                      <span className="text-[#f3cc76]">4 essentials + wooden spoon →</span>
-                    </Link>
                   </div>
                 </li>
 
@@ -408,9 +400,6 @@ const Navbar = ({ onCartToggle }) => {
                   </Link>
                   <Link to="/products?category=Spice Blends" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-amber-900/5 text-xs font-bold text-amber-950 hover:text-[#df432b] flex items-center justify-between">
                     Spice Blends <span>→</span>
-                  </Link>
-                  <Link to="/products?category=Combo Packs" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-amber-900/5 text-xs font-bold text-amber-950 hover:text-[#df432b] flex items-center justify-between">
-                    Value Combo Packs <span>→</span>
                   </Link>
                 </div>
 

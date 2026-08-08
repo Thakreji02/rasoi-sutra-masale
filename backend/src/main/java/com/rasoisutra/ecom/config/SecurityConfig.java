@@ -66,6 +66,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/orders/checkout").permitAll()
                 .requestMatchers("/api/orders/stream").permitAll() // Admin SSE stream
                 .requestMatchers("/api/payments/**").permitAll()
+                .requestMatchers("/api/upload/**").permitAll()
                 .requestMatchers("/api/v1/addresses/**").authenticated()
                 .requestMatchers("/api/v1/orders/**").authenticated()
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")

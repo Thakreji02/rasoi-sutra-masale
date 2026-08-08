@@ -51,7 +51,7 @@ const Footer = () => {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
               </a>
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/rasoi_sutra_origin/" 
                 target="_blank" 
                 rel="noreferrer" 
                 className="h-9 w-9 rounded-full bg-[#FAF6F0]/10 flex items-center justify-center hover:bg-[#df432b] hover:text-white transition-all duration-300"
@@ -165,7 +165,7 @@ const Footer = () => {
               </li>
               <li className="flex gap-3 items-start text-sm text-[#FAF6F0]/70">
                 <Phone size={18} className="text-[#df432b] shrink-0 mt-0.5" />
-                <span>+91 98765 43210</span>
+                <a href="tel:+919669349555" className="hover:text-white transition-colors">+91 96693 49555</a>
               </li>
               <li className="flex gap-3 items-start text-sm text-[#FAF6F0]/70">
                 <Mail size={18} className="text-[#df432b] shrink-0 mt-0.5" />

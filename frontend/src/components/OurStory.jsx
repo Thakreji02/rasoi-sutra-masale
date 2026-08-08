@@ -268,7 +268,7 @@ const OurStory = () => {
             {t.contactDesc}
           </p>
           <a
-            href="https://wa.me/919876543210?text=Namaste%20Rasoi%20Sutra%2C%20I%20have%20a%20question%20about%20your%20spices%20and%20health."
+            href="https://wa.me/919669349555?text=Namaste%20Rasoi%20Sutra%2C%20I%20have%20a%20question%20about%20your%20spices%20and%20health."
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#df432b] hover:bg-[#b92f18] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-transform hover:scale-105"

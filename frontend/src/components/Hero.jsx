@@ -30,7 +30,7 @@ const Hero = () => {
                 <span>100% Pure & Cold-Ground Masale</span>
               </motion.div>
 
-              <div className="space-y-3 w-full">
+              <div className="space-y-2 w-full">
                 <motion.h1 
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -38,7 +38,7 @@ const Hero = () => {
                   className="text-4xl sm:text-6xl lg:text-7xl font-serif font-black text-[#2e1c13] tracking-tight leading-[1.08]"
                 >
                   Rasoi Sutra
-                  <span className="block text-[#df432b] text-3xl sm:text-5xl lg:text-6xl mt-1">
+                  <span className="block text-[#df432b] text-xl sm:text-2xl lg:text-3xl font-serif font-bold tracking-normal mt-2">
                     Har Rasoi Ka Asli Swad.
                   </span>
                 </motion.h1>
@@ -72,24 +72,6 @@ const Hero = () => {
                 >
                   Our Story & Values
                 </button>
-              </motion.div>
-              
-              {/* Special Promotion offer badge */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex flex-col gap-1 text-left border-t border-amber-900/10 pt-4 w-full"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🎁</span>
-                  <strong className="text-[#168329] font-bold text-base sm:text-lg">
-                    Everyday Kitchen Combo ₹499
-                  </strong>
-                </div>
-                <span className="text-xs sm:text-sm text-amber-950/70 font-semibold pl-6">
-                  4 Everyday Spices + FREE Handcrafted Wooden Masala Spoon
-                </span>
               </motion.div>
             </div>
           </div>

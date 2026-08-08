@@ -104,7 +104,7 @@ function HomeContent() {
                   Sell Your Spices to Us →
                 </Link>
                 <a 
-                  href="https://wa.me/910000000000?text=Hello%20Rasoi%20Sutra%2C%20I%20am%20a%20spice%20farmer%20and%20want%20to%20connect."
+                  href="https://wa.me/919669349555?text=Hello%20Rasoi%20Sutra%2C%20I%20am%20a%20spice%20farmer%20and%20want%20to%20connect."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center px-6 py-3.5 bg-white text-[#173f27] border border-[#cfe4be] hover:bg-[#e4efdf]/20 font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition-transform hover:scale-105"
@@ -163,7 +163,7 @@ function HomeContent() {
               Contact Us
             </Link>
             <a 
-              href="https://wa.me/910000000000?text=Hello%20Rasoi%20Sutra"
+              href="https://wa.me/919669349555?text=Hello%20Rasoi%20Sutra"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-6 py-3.5 bg-[#173f27] hover:bg-[#235e32] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-transform hover:scale-105"
@@ -176,7 +176,7 @@ function HomeContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-left">
             <div className="bg-amber-50/30 p-5 rounded-2xl border border-amber-900/5">
               <span className="text-[10px] font-extrabold tracking-widest text-amber-900/40 uppercase block">📞 Call or WhatsApp</span>
-              <strong className="block text-sm text-[#2e1c13] mt-1">+91 00000 00000</strong>
+              <strong className="block text-sm text-[#2e1c13] mt-1">+91 96693 49555</strong>
             </div>
             <div className="bg-amber-50/30 p-5 rounded-2xl border border-amber-900/5">
               <span className="text-[10px] font-extrabold tracking-widest text-amber-900/40 uppercase block">📦 Order Support</span>

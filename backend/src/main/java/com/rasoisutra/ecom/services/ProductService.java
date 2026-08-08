@@ -22,11 +22,15 @@ public class ProductService {
         Sort.Direction dir = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         String sortProperty = (sortBy != null && !sortBy.trim().isEmpty()) ? sortBy : "createdAt";
         
-        // Map old sorting fields to new ones if requested
-        if ("price".equals(sortProperty)) {
-            sortProperty = "createdAt"; // Fallback as price is now in variants child list
-        } else if ("name".equals(sortProperty)) {
+        // Map sort fields safely to Product entity properties
+        if ("price".equalsIgnoreCase(sortProperty) || "sellingprice".equalsIgnoreCase(sortProperty) || "mrp".equalsIgnoreCase(sortProperty)) {
+            sortProperty = "createdAt"; // Fallback as price is inside the variants child collection
+        } else if ("name".equalsIgnoreCase(sortProperty) || "title".equalsIgnoreCase(sortProperty)) {
             sortProperty = "productName";
+        } else if ("rating".equalsIgnoreCase(sortProperty)) {
+            sortProperty = "rating";
+        } else {
+            sortProperty = "createdAt";
         }
         
         Pageable pageable = PageRequest.of(page, size, Sort.by(dir, sortProperty));
